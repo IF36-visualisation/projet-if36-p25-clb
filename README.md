@@ -117,7 +117,7 @@ Chacun des datasets contiennent les mêmes champs, à l'exception de 'Red_Weathe
 
 
 
-# **Partie 1 - Quelle est l'impact des conditions météorologiques sur les différents types de vin?:**
+#### **Partie 1 - Quelle est l'impact des conditions météorologiques sur les différents types de vin?:**
 
 1. Quel est l'impact des variations de température sur l’appréciation vin rouge/blanc/rosé/pétillant ?
    - On peut imaginer que ....
@@ -138,11 +138,10 @@ Chacun des datasets contiennent les mêmes champs, à l'exception de 'Red_Weathe
    - *_Features_*: 
 
 
-# **Partie 2 - ....?:**
+#### **Partie 2 - ....?:**
 
 4. Il y a t’il un pays producteur préféré à l’échelle mondiale ? 
    - Nous souhaitons savoir si la renommé de certains pays pour leur vin est avérée dans l'appréciation globale des vins
-
    - *_Graphique_*: 
    - *_Dataset_*: 
    - *_Features_*: 
@@ -183,7 +182,7 @@ Chacun des datasets contiennent les mêmes champs, à l'exception de 'Red_Weathe
    - *_Features_*: 
 
 10. Y a-t-il réellement des "bonnes années" où toutes les conditions météorologiques sont idéales pour tous les types de vin ? Les vignes cultivées dans des conditions optimales produisent elles des vins plus appréciés lors des notations ?
-     - 
+    - 
     - *_Graphique_*: 
     - *_Dataset_*: 
     - *_Features_*: 
