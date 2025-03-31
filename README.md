@@ -174,19 +174,19 @@ L'analyse des types de données et de leur description nous a amené à nous pos
 - *_Features_* : 
    
 10. Existe-t-il une relation entre la variabilité interannuelle des conditions météorologiques et la constance de la qualité des vins produits dans une région donnée ?
-- On peut imaginer que ....
-- *_Graphique_* : 
-- *_Dataset_* : 
-- *_Features_* : 
+- Nous nous attendons à observer que dans les régions où le climat varie peu d’une année à l’autre, la qualité du vin (mesurée par la note moyenne) est plus constante. Cela impliquerait que la stabilité climatique joue un rôle dans la régularité de la production vinicole. Le défi ici est de quantifier la variabilité climatique (écart-type sur plusieurs années) et de la corréler avec la variance des notes par région.
+- *_Graphique_* : Boxplot des notes par région avec écart-type climatique en couleur ou taille.
+- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
+- *_Features_* :  Region, Rating, Year, Jan_tavg à Dec_tavg (ou variables climatiques globales agrégées par an)
 
 11. Y a-t-il réellement des "bonnes années" où toutes les conditions météorologiques sont idéales pour tous les types de vin ? Les vignes cultivées dans des conditions optimales produisent elles des vins plus appréciés lors des notations ?
-- On peut imaginer que ....
-- *_Graphique_* : 
-- *_Dataset_* : 
-- *_Features_* : 
+- On s’attend à ce que certaines années se démarquent avec des conditions climatiques idéales (températures moyennes modérées, peu de précipitations pendant la floraison et la récolte, bon ensoleillement), et qu’elles soient associées à des notes plus élevées. On pourrait observer un pic global de notes dans ces “bonnes années”. Il faudra agréger les données météo sur l’année, les normaliser, puis les relier aux moyennes de notes par millésime.
+- *_Graphique_* : Courbe des notes moyennes par année avec superposition d’un indice climatique "optimal"
+- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
+- *_Features_* : Year, Rating, moyenne climat annuel (température moyenne, ensoleillement, précipitations)
 
 12. Peut-on prédire la popularité future d'un vin en fonction des conditions météorologiques de l'année de production ?
-- On peut imaginer que ....
-- *_Graphique_* : 
-- *_Dataset_* : 
-- *_Features_* : 
+- Nous pensons qu’il est possible de prédire une note approximative à partir des données climatiques de l’année de production. On pourrait utiliser un modèle de régression (linéaire ou non-linéaire) entraîné sur les températures, précipitations et ensoleillement de chaque mois, pour prédire la note. Un bon R² indiquerait que le climat est un prédicteur fiable de la qualité du vin.
+- *_Graphique_* : Courbe réelle vs prédite (scatter plot) + métrique de régression (R², MAE)
+- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
+- *_Features_* : Rating (à prédire), Jan à Dec (tavg, tmin, tmax, prcp, tsun)
