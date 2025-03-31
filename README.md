@@ -120,22 +120,22 @@ L'analyse des types de données et de leur description nous a amené à nous pos
 #### Questions
 
 1. Quel est l'impact des variations de température sur l’appréciation vin rouge/blanc/rosé/pétillant ?
-- On peut imaginer que ....
-- *_Graphique_* :
-- *_Dataset_* : 
-- *_Features_* : 
+- On peut imaginer que la température de certains mois, comme la période de maturation du raisin, est fortement corrélée à la note du vin. Lorsque la température augmente, la note du vin peut également augmenter. Cependant, au-delà d’un certain seuil critique, une température trop élevée peut entraîner une baisse de la qualité du vin, et donc de sa note. Les températures extrêmes peuvent ainsi avoir un effet négatif sur la qualité. Les différents types de vin réagissent de manière variable aux fluctuations thermiques ; par exemple, le vin rouge est souvent plus résistant aux fortes chaleurs.
+- *_Graphique_* :Scatterplot (note vs. température moyenne de mois clés), Line chart (corrélation entre la note et la température moyenne mensuelle), Heatmap (relation statistique entre température et note, identification des seuils ou mois atypiques), Box plot (analyse de l'impact des conditions extrêmes)
+- *_Dataset_* : Red_Weather, Rose_Weather, Sparkling_Weather, White_Weather
+- *_Features_* : Rating, Price, <tous les mois>_tmin, <tous les mois>_tmax, <tous les mois>_tage, year
 
 2.  Comment les précipitations influencent elles la qualité du vin rouge/blanc/rosé/pétillant ?
-- On peut imaginer que ....
-- *_Graphique_* : 
-- *_Dataset_* : 
-- *_Features_* : 
+- On peut imaginer que les précipitations pendant certaines périodes clés du cycle de croissance de la vigne (par exemple, la période de maturation) influencent la qualité du raisin, et donc la note du vin. Une quantité modérée d'eau peut favoriser la croissance, tandis qu’un excès de pluie peut réduire la qualité et faire baisser la note. L’impact peut également varier selon le type de vin : par exemple, les vins rosés ou pétillants pourraient être plus sensibles à une humidité excessive.
+- *_Graphique_* : Scatterplot (note vs. précipitations mensuelles), Line chart (corrélation entre la note et les précipitations), Heatmap (relation statistique entre précipitations et note), Box plot (analyse de l’impact des années très humides)
+- *_Dataset_* : Red_Weather, Rose_Weather, Sparkling_Weather, White_Weather
+- *_Features_* : Rating, Price, <tous les mois>_prcp, year
 
 3.  Comment l'ensoleillement influence-t-il la qualité du vin rouge/blanc/rosé/pétillant ?
-- On peut imaginer que ....
-- *_Graphique_* : 
-- *_Dataset_* : 
-- *_Features_* : 
+- On peut imaginer que des raisins bénéficiant d’un ensoleillement important pendant certains mois clés (comme la période de maturation) produisent des vins mieux notés. Cependant, un ensoleillement excessif, accompagné de chaleur intense, pourrait entraîner une baisse de la qualité. Chaque type de vin réagit différemment : par exemple, le vin rouge peut développer davantage de tanins sous un fort ensoleillement.
+- *_Graphique_* : Scatterplot (note vs. durée d’ensoleillement mensuelle), Line chart (corrélation entre la note et l’ensoleillement), Heatmap (relation statistique entre ensoleillement et note), Box plot (analyse de l’impact des années très ensoleillées)
+- *_Dataset_* : Red_Weather, Rose_Weather, Sparkling_Weather, White_Weather
+- *_Features_* : Rating, Price, <tous les mois>_Tsun, year
 
 4. Il y a t’il un pays producteur préféré à l’échelle mondiale ? 
 - Nous nous attendons à ce que l'Italie soit le pays producteur dont les vins sont les plus appréciés car c'est le plus gros producteur du monde, mais aussi celui qui subit le moins de conditions météorologiques défavorables.
