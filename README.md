@@ -173,19 +173,19 @@ L'analyse des types de données et de leur description nous a amené à nous pos
 - *_Dataset_* : 
 - *_Features_* : 
    
-9. Les vins produits dans des régions avec des conditions météorologiques similaires ont-ils des notes similaires, indépendamment du type de vin ?
+10. Les vins produits dans des régions avec des conditions météorologiques similaires ont-ils des notes similaires, indépendamment du type de vin ?
 - On peut imaginer que ....
 - *_Graphique_* : 
 - *_Dataset_* : 
 - *_Features_* : 
 
-10. Y a-t-il réellement des "bonnes années" où toutes les conditions météorologiques sont idéales pour tous les types de vin ? Les vignes cultivées dans des conditions optimales produisent elles des vins plus appréciés lors des notations ?
+11. Y a-t-il réellement des "bonnes années" où toutes les conditions météorologiques sont idéales pour tous les types de vin ? Les vignes cultivées dans des conditions optimales produisent elles des vins plus appréciés lors des notations ?
 - On peut imaginer que ....
 - *_Graphique_* : 
 - *_Dataset_* : 
 - *_Features_* : 
 
-11. Peut-on prédire la popularité future d'un vin en fonction des conditions météorologiques de l'année de production ?
+12. Peut-on prédire la popularité future d'un vin en fonction des conditions météorologiques de l'année de production ?
 - On peut imaginer que ....
 - *_Graphique_* : 
 - *_Dataset_* : 
