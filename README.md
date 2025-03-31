@@ -115,14 +115,14 @@ Chacun des datasets contiennent les mêmes champs, à l'exception de 'Red_Weathe
 
 ### Plan d’Analyse
 
-L'analyse des types de données et de leur description nous a amené à nous poser diverses questions, que nous détaillons ci-après :
+L'analyse des types de données et de leur description nous a amené à nous poser diverses questions, que nous détaillons ci-après. Pour certaines question, il pourra être pertinent de rassembler toutes les données dans une seule et même table.
 
 #### Questions
 
 1. Quel est l'impact des variations de température sur l’appréciation vin rouge/blanc/rosé/pétillant ?
 - On peut imaginer que ....
-- *_Graphique_* : 
-- *_Dataset_* : 
+- *_Graphique_* :
+- - *_Dataset_* : 
 - *_Features_* : 
 
 2.  Comment les précipitations influencent elles la qualité du vin rouge/blanc/rosé/pétillant ?
