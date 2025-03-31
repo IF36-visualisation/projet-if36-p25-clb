@@ -138,30 +138,30 @@ L'analyse des types de données et de leur description nous a amené à nous pos
 - *_Features_* : 
 
 4. Il y a t’il un pays producteur préféré à l’échelle mondiale ? 
-- On peut imaginer que ....
-- *_Graphique_* : 
-- *_Dataset_* : 
-- *_Features_* : 
+- Nous nous attendons à ce que l'Italie soit le pays producteur dont les vins sont les plus appréciés car c'est le plus gros producteur du monde, mais aussi celui qui subit le moins de conditions météorologiques défavorables.
+- *_Graphique_* : Choroplet map ou population chart
+- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
+- *_Features_* : country, rating
 
 5. Les vins produits dans des régions avec des conditions météorologiques similaires ont-ils des notes similaires, indépendamment du type de vin ?
+- On peut imaginer que les régions disposant des mêmes conditions météorologiques reçoivent les mêmes notes. Le problème que l'on pourrait rencontrer serait celui de l'influence d'autres facteurs comme le prix, ou la réputation de la région.
+- *_Graphique_* : Scatter plot mais faire une seule variable des conditions météorologiques
+- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
+- *_Features_* : Region, Rating, Jan_tavg, Jan_tmin, Jan_tmax, Jan_prcp, Jan_tsun, Feb_tavg, Feb_tmin, Feb_tmax, Feb_prcp, Feb_tsun, Mar_tavg, Mar_tmin, Mar_tmax, Mar_prcp, Mar_tsun, Apr_tavg, Apr_tmin, Apr_tmax, Apr_prcp, Apr_tsun, May_tavg, May_tmin, May_tmax, May_prcp, May_tsun, Jun_tavg, Jun_tmin, Jun_tmax, Jun_prcp, Jun_tsun, Jul_tavg, Jul_tmin, Jul_tmax, Jul_prcp, Jul_tsun, Aug_tavg, Aug_tmin, Aug_tmax, Aug_prcp, Aug_tsun, Sep_tavg, Sep_tmin, Sep_tmax, Sep_prcp, Sep_tsun, Oct_tavg, Oct_tmin, Oct_tmax, Oct_prcp, Oct_tsun, Nov_tavg, Nov_tmin, Nov_tmax, Nov_prcp, Nov_tsun, Dec_tavg, Dec_tmin, Dec_tmax, Dec_prc, Dec_tsun
+
+6. Le climat est-il le facteur principal de l'appréciation du vin ? 
+- On peut imaginer que les régions les plus propices à la croissance adéquate des grains de raisins font les vins les plus appréciés. Le problème pourrait être que la renommée du vin ou son prix entrent en compte inconsciemment dans la note du vin (de manière favorable ou défavorable).
+- *_Graphique_* : Bar Chart 
+- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
+- *_Features_* : Region, Rating, Year, Price, Winery, Jan_tavg, Feb_tavg, Mar_tavg, Apr_tavg, May_tavg, Jun_tavg, Jul_tavg, Aug_tavg, Sep_tavg, Oct_tavg, Nov_tavg, Dec_tavg
+
+7. Y a-t-il des régions productrices davantage impactées par le changement climatique ? Si oui, cela apparaît-il dans la notation du vin ?
 - On peut imaginer que ....
 - *_Graphique_* : 
 - *_Dataset_* : 
 - *_Features_* : 
 
-6. Comment les changements climatiques mondiaux affectent ils la production de vin dans différentes régions viticoles ? 
-- On peut imaginer que ....
-- *_Graphique_* : 
-- *_Dataset_* : 
-- *_Features_* : 
-   
-7. Il y a t’il des régions productrices davantage impactées par le changement climatique ? Si oui, cela apparait il dans la notation du vin ?
-- On peut imaginer que ....
-- *_Graphique_* : 
-- *_Dataset_* : 
-- *_Features_* : 
-
-8. Il y a-t-il une corrélation entre les conditions météorologiques et les préférences des consommateurs pour certains types de vin ?
+8. Y a-t-il une corrélation entre les conditions météorologiques et les préférences des consommateurs pour certains types de vin ?
 - On peut imaginer que ....
 - *_Graphique_* : 
 - *_Dataset_* : 
@@ -173,7 +173,7 @@ L'analyse des types de données et de leur description nous a amené à nous pos
 - *_Dataset_* : 
 - *_Features_* : 
    
-10. Les vins produits dans des régions avec des conditions météorologiques similaires ont-ils des notes similaires, indépendamment du type de vin ?
+10. Existe-t-il une relation entre la variabilité interannuelle des conditions météorologiques et la constance de la qualité des vins produits dans une région donnée ?
 - On peut imaginer que ....
 - *_Graphique_* : 
 - *_Dataset_* : 
