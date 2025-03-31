@@ -115,9 +115,9 @@ Chacun des datasets contiennent les mêmes champs, à l'exception de 'Red_Weathe
 
 ### Plan d’Analyse
 
+L'analyse des types de données et de leur description nous a amené à nous poser diverses questions, que nous détaillons ci-après :
 
-
-#### **Partie 1 - Quelle est l'impact des conditions météorologiques sur les différents types de vin?:**
+#### Questions
 
 1. Quel est l'impact des variations de température sur l’appréciation vin rouge/blanc/rosé/pétillant ?
    - On peut imaginer que ....
@@ -126,70 +126,67 @@ Chacun des datasets contiennent les mêmes champs, à l'exception de 'Red_Weathe
    - *_Features_* : 
 
 2.  Comment les précipitations influencent elles la qualité du vin rouge/blanc/rosé/pétillant ?
-   - On va chercher à savoir si ... Le potentiel pb ...
+   - On peut imaginer que ....
    - *_Graphique_* : 
    - *_Dataset_* : 
-   - *_Features_*: 
+   - *_Features_* : 
 
 3.  Comment l'ensoleillement influence-t-il la qualité du vin rouge/blanc/rosé/pétillant ?
-   - Nous nous attendons à ce que...
-   - *_Graphique_*: 
-   - *_Dataset_*: 
-   - *_Features_*: 
-
-
-#### **Partie 2 - ....?:**
+   - On peut imaginer que ....
+   - *_Graphique_* : 
+   - *_Dataset_* : 
+   - *_Features_* : 
 
 4. Il y a t’il un pays producteur préféré à l’échelle mondiale ? 
-   - Nous souhaitons savoir si la renommé de certains pays pour leur vin est avérée dans l'appréciation globale des vins
-   - *_Graphique_*: 
-   - *_Dataset_*: 
-   - *_Features_*: 
+   - On peut imaginer que ....
+   - *_Graphique_* : 
+   - *_Dataset_* : 
+   - *_Features_* : 
 
 5. Les vins produits dans des régions avec des conditions météorologiques similaires ont-ils des notes similaires, indépendamment du type de vin ?
-   - ..................
-   - *_Graphique_*: 
-   - *_Dataset_*:
-   - *_Features_*: 
+   - On peut imaginer que ....
+   - *_Graphique_* : 
+   - *_Dataset_* : 
+   - *_Features_* : 
 
 6. Comment les changements climatiques mondiaux affectent ils la production de vin dans différentes régions viticoles ? 
-	 -   .........................................
-   - *_Graphique_*: 
-   - *_Dataset_*: 
-   - *_Features_*: 
+   - On peut imaginer que ....
+   - *_Graphique_* : 
+   - *_Dataset_* : 
+   - *_Features_* : 
    
 7. Il y a t’il des régions productrices davantage impactées par le changement climatique ? Si oui, cela apparait il dans la notation du vin ?
-   - *_Graphique_*: 
-   - *_Dataset_*: 
-   - *_Features_*: 
+   - On peut imaginer que ....
+   - *_Graphique_* : 
+   - *_Dataset_* : 
+   - *_Features_* : 
 
 8. Il y a-t-il une corrélation entre les conditions météorologiques et les préférences des consommateurs pour certains types de vin ?
-	 - 
-    - *_Graphique_*: 
-    - *_Dataset_*: 
-    - *_Features_*: 
+   - On peut imaginer que ....
+   - *_Graphique_* : 
+   - *_Dataset_* : 
+   - *_Features_* : 
 
 9. Les notes attribuées au vin sont-elles cohérentes vis à vis des conditions météorologiques ou il y a t’il d’autres facteurs qui entrent en compte ? ( prix, popularité de la région de production, pays de provenance, réputé du vin…)
-   - 
-   - *_Graphique_*:
-   - *_Dataset_*:
-   - *_Features_*: 
+   - On peut imaginer que ....
+   - *_Graphique_* : 
+   - *_Dataset_* : 
+   - *_Features_* : 
    
 9. Les vins produits dans des régions avec des conditions météorologiques similaires ont-ils des notes similaires, indépendamment du type de vin ?
-   - 
-   - *_Graphique_*: 
-   - *_Dataset_*: 
-   - *_Features_*: 
+   - On peut imaginer que ....
+   - *_Graphique_* : 
+   - *_Dataset_* : 
+   - *_Features_* : 
 
 10. Y a-t-il réellement des "bonnes années" où toutes les conditions météorologiques sont idéales pour tous les types de vin ? Les vignes cultivées dans des conditions optimales produisent elles des vins plus appréciés lors des notations ?
-    - 
-    - *_Graphique_*: 
-    - *_Dataset_*: 
-    - *_Features_*: 
-
+   - On peut imaginer que ....
+   - *_Graphique_* : 
+   - *_Dataset_* : 
+   - *_Features_* : 
 
 11. Peut-on prédire la popularité future d'un vin en fonction des conditions météorologiques de l'année de production ?
-    - 
-    - *_Graphique_*: 
-    - *_Dataset_*: 
-    - *_Features_*: 
+   - On peut imaginer que ....
+   - *_Graphique_* : 
+   - *_Dataset_* : 
+   - *_Features_* : 
