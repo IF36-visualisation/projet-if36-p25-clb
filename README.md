@@ -122,7 +122,7 @@ L'analyse des types de données et de leur description nous a amené à nous pos
 1. Quel est l'impact des variations de température sur l’appréciation vin rouge/blanc/rosé/pétillant ?
 - On peut imaginer que ....
 - *_Graphique_* :
-- - *_Dataset_* : 
+- *_Dataset_* : 
 - *_Features_* : 
 
 2.  Comment les précipitations influencent elles la qualité du vin rouge/blanc/rosé/pétillant ?
@@ -156,22 +156,22 @@ L'analyse des types de données et de leur description nous a amené à nous pos
 - *_Features_* : Region, Rating, Year, Price, Winery, Jan_tavg, Feb_tavg, Mar_tavg, Apr_tavg, May_tavg, Jun_tavg, Jul_tavg, Aug_tavg, Sep_tavg, Oct_tavg, Nov_tavg, Dec_tavg
 
 7. Y a-t-il des régions productrices davantage impactées par le changement climatique ? Si oui, cela apparaît-il dans la notation du vin ?
-- On peut imaginer que ....
-- *_Graphique_* : 
-- *_Dataset_* : 
-- *_Features_* : 
+- On peut imaginer que certaines régions sont plus impactées que d'autres par le dérèglement climatique, et que des régions productrices en font partie. Nous souhaitons vérifier ceci en étudiant les différences de conditions météorologiques au fil des années et selon les régions. Puis, si certaines se démarquent, nous souhaitons étudier l'évolution des notations du vin en fonction des années pour vérifier s'il y a une corrélation. On peut imaginer que certaines régions qui sont davantage impactée par notamment la hausse des températures ou l'augmentation des précipitations auront des notations de vin en baisse au fil des années.
+- *_Graphique_* : Analyse des tendances climatiques -> heatmap avec la région, les années, la température moyenne/les précipitations ; corrélation avec la notation -> nuage de points sur les pays ciblés par les changements climatiques 
+- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
+- *_Features_* : Country, Rating, Year, Jan_tavg, Jan_prcp, Feb_tavg, Feb_prcp, Mar_tavg, Mar_prcp, Apr_tavg, Apr_prcp, May_tavg, May_prcp, Jun_tavg, Jun_prcp, Jul_tavg, Jul_prcp, Aug_tavg, Aug_prcp, Sep_tavg, Sep_prcp, Oct_tavg, Oct_prcp, Nov_tavg, Nov_prcp, Dec_tavg, Dec_prcp
 
 8. Y a-t-il une corrélation entre les conditions météorologiques et les préférences des consommateurs pour certains types de vin ?
-- On peut imaginer que ....
-- *_Graphique_* : 
-- *_Dataset_* : 
-- *_Features_* : 
+- On peut imaginer que les raisins des vins préférés par les consommateurs ont poussé dans des conditions météorologiques similaires. Pour aller plus loin, nous pouvons étudier si c'est le cas pour tous les types de vin.
+- *_Graphique_* : Scatter plot, en étudiant les conditions météorologiques en fonction des notations pour chaque type de vin. Nous pouvons étudier les corrélations par rapport aux températures moyennes, selon les précipitations, et selon l'ensoleillement.
+- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
+- *_Features_* : Rating, Jan à Dec (tavg, prcp, tsun)
 
 9. Les notes attribuées au vin sont-elles cohérentes vis à vis des conditions météorologiques ou il y a t’il d’autres facteurs qui entrent en compte ? ( prix, popularité de la région de production, pays de provenance, réputé du vin…)
-- On peut imaginer que ....
-- *_Graphique_* : 
-- *_Dataset_* : 
-- *_Features_* : 
+- On peut imaginer que certains vins sont mieux notés parce qu'ils coûtent plus cher, ou parce qu'ils proviennent d'un pays en particulier.
+- *_Graphique_* : Scatter plot, en étudiant la notation des vins selon le prix/le pays de provenance pour chaque type de vin
+- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
+- *_Features_* : Rating, Price, Country
    
 10. Existe-t-il une relation entre la variabilité interannuelle des conditions météorologiques et la constance de la qualité des vins produits dans une région donnée ?
 - Nous nous attendons à observer que dans les régions où le climat varie peu d’une année à l’autre, la qualité du vin (mesurée par la note moyenne) est plus constante. Cela impliquerait que la stabilité climatique joue un rôle dans la régularité de la production vinicole. Le défi ici est de quantifier la variabilité climatique (écart-type sur plusieurs années) et de la corréler avec la variance des notes par région.
