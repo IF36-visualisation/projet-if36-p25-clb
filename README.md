@@ -46,8 +46,8 @@ Chacun des datasets contiennent les mêmes champs, à l'exception de 'Red_Weathe
 | NumberOfRatings | integer | Le volume de critiques ou de notations reçues |
 | Price | decimal | Le coût du vin |
 | Year | integer | Année de production du vin |
-| city | string  | Ville de production |
-| country | string | Pays de production du vin |
+| city | string  | Champ uniquement dans 'Red_Weather' et 'White_Weather', Ville de production |
+| country | string | Champ uniquement dans 'Red_Weather' et 'White_Weather', Pays de production du vin |
 | lat | decimal | Latitude de la ville de provenance |
 | lng | decimal | Longitude de la ville de provenance |
 | Jan_tavg | decimal | Température moyenne  en °C dans la ville de provenance au cours du mois de janvier de l'année précédant la production du vin |
