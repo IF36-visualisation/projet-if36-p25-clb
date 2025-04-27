@@ -1,3 +1,14 @@
+  ---
+title: "Rapport"
+output:
+  html_document: default
+  pdf_document: default
+date: "2024-05-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 # Rapport - Analyse de la qualité de différents vins et des conditions météorologiques des régions de production
 
 ## Introduction
@@ -118,6 +129,134 @@ L'analyse des types de données et de leur description nous a amené à nous pos
 - *_Graphique_* : Scatter plot, en étudiant la notation des vins selon le prix/le pays de provenance pour chaque type de vin
 - *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
 - *_Features_* : Rating, Price, Country
+ 
+10. Existe-t-il une relation entre la variabilité interannuelle des conditions météorologiques et la constance de la qualité des vins produits dans une région donnée ?
+- Nous nous attendons à observer que dans les régions où le climat varie peu d’une année à l’autre, la qualité du vin (mesurée par la note moyenne) est plus constante. Cela impliquerait que la stabilité climatique joue un rôle dans la régularité de la production vinicole. Le défi ici est de quantifier la variabilité climatique (écart-type sur plusieurs années) et de la corréler avec la variance des notes par région.
+- *_Graphique_* : Boxplot des notes par région avec écart-type climatique en couleur ou taille.
+- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
+- *_Features_* :  Region, Rating, Year, Jan_tavg à Dec_tavg (ou variables climatiques globales agrégées par an)
+
+11. Y a-t-il réellement des "bonnes années" où toutes les conditions météorologiques sont idéales pour tous les types de vin ? Les vignes cultivées dans des conditions optimales produisent elles des vins plus appréciés lors des notations ?
+- On s’attend à ce que certaines années se démarquent avec des conditions climatiques idéales (températures moyennes modérées, peu de précipitations pendant la floraison et la récolte, bon ensoleillement), et qu’elles soient associées à des notes plus élevées. On pourrait observer un pic global de notes dans ces “bonnes années”. Il faudra agréger les données météo sur l’année, les normaliser, puis les relier aux moyennes de notes par millésime.
+- *_Graphique_* : Courbe des notes moyennes par année avec superposition d’un indice climatique "optimal"
+- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
+- *_Features_* : Year, Rating, moyenne climat annuel (température moyenne, ensoleillement, précipitations)
+
+12. Peut-on prédire la popularité future d'un vin en fonction des conditions météorologiques de l'année de production ?
+- Nous pensons qu’il est possible de prédire une note approximative à partir des données climatiques de l’année de production. On pourrait utiliser un modèle de régression (linéaire ou non-linéaire) entraîné sur les températures, précipitations et ensoleillement de chaque mois, pour prédire la note. Un bon R² indiquerait que le climat est un prédicteur fiable de la qualité du vin.
+- *_Graphique_* : Courbe réelle vs prédite (scatter plot) + métrique de régression (R², MAE)
+- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
+- *_Features_* : Rating (à prédire), Jan à Dec (tavg, tmin, tmax, prcp, tsun)
+
+## Analyse Exploratoire
+
+```{r librairies, message=FALSE, warning=FALSE}
+# Import des librairies
+library(ggplot2)
+library(dplyr)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(readr)
+library(viridis)
+```
+```{r datasets, message=FALSE, warning=FALSE}
+# Import des datasets
+red <- read_csv("Red_Weather.csv",show_col_types = FALSE)
+white <- read_csv("White_Weather.csv",show_col_types = FALSE)
+rose <- read_csv("Rose_Weather.csv",show_col_types = FALSE)
+sparkling <- read_csv("Sparkling_Weather.csv",show_col_types = FALSE)
+```
+
+####4. Il y a t’il un pays producteur préféré à l’échelle mondiale ? 
+
+Nous nous attendons à ce que l'Italie soit le pays producteur dont les vins sont les plus appréciés, car c'est le plus gros producteur du monde, mais aussi celui qui subit le moins de conditions météorologiques défavorables.
+
+```{r question 4}
+# Garder uniquement les colonnes utiles
+red <- red %>% select(Country, Rating)
+rose <- rose %>% select(Country, Rating)
+sparkling <- sparkling %>% select(Country, Rating)
+white <- white %>% select(Country, Rating)
+
+# Fusionner les datasets
+wine_data <- bind_rows(red, rose, sparkling, white)
+
+# Nettoyer les données (ex: retirer NA)
+wine_data <- wine_data %>% filter(!is.na(Country), !is.na(Rating))
+
+# Corriger les noms de pays dans wine_data
+wine_data <- wine_data %>%
+  mutate(Country = case_when(
+    Country == "United States" ~ "United States of America",
+    TRUE ~ Country
+  ))
+
+# Agréger : calculer la moyenne des notes par pays
+country_ratings <- wine_data %>%
+  group_by(Country) %>%
+  summarise(mean_rating = mean(Rating, na.rm = TRUE),
+            count = n()) %>%
+  arrange(desc(mean_rating))
+```
+**Graphique 1 : Choropleth Map (carte colorée)**
+
+```{r qu4 graphique 1}
+# --- Graphique 1 : Choropleth Map (carte colorée) ---
+# Charger la carte du monde
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+# Fusionner les données des vins avec les données géographiques
+world_wine <- left_join(world, country_ratings, by = c("name" = "Country"))
+
+# Créer la carte choroplèthe
+ggplot(data = world_wine) +
+  geom_sf(aes(fill = mean_rating)) +
+  scale_fill_gradientn(
+    colours = c("yellow", "lightgreen", "skyblue", "orchid", "blue4"),
+    limits = c(0, 5),
+    na.value = "lightgrey"
+  ) +
+  labs(title = "Moyenne des notes de vin par pays",
+       fill = "Note moyenne",
+       caption = "Sources : Red, Rosé, White et Sparkling Weather") +
+  theme_minimal()
+```
+
+Avec cette représentation, on voit que l'Europe, l'Amérique du Nord, certains pays d'Amérique du Sud, l'Afrique du Sud, la Chine, l'Australie et l'Océanie sont représentés. Cependant, en regardant les couleurs, les notes moyennes des vins de ces pays producteurs sont plutôt proches, et les notes des pays les mieux notés se situent globalement entre 3,5 et 4,5. Avec cete représentation, il est difficile de voir les pays les mieux notés du monde. 
+#Nous allons donc effectuer une seconde représentation afin d'obtenir les pays les mieux notés mondialement.
+
+**Graphique 2 : Barplot (Population Chart)**
+```{r}
+# Top 10 des pays
+top_countries <- country_ratings %>%
+  top_n(10, mean_rating)
+
+ggplot(top_countries, aes(x = reorder(Country, mean_rating), y = mean_rating)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "Top 10 des pays selon la note moyenne de leurs vins",
+       x = "Pays",
+       y = "Note moyenne",
+       caption = "Sources : Red, Rose, White et Sparkling Weather") +
+  theme_minimal()
+
+# Nombre d'occurrences
+count_Moldova <- wine_data %>%
+  filter(Country == 'Moldova') %>%
+  nrow()
+  print(paste("Nombre d'occurences de la Moldavie :",count_Moldova))
+  
+  count_Italy <- wine_data %>%
+    filter(Country == 'Italy') %>%
+    nrow()
+  print(paste("Nombre d'occurences de l'Italie :",count_Italy))
+```
+
+Si l'on se base simplement sur les résultats que nous apportent les données, on pourrait en conclure que la Moldavie est le pays producteur de vin préféré à l'échelle mondiale. Cependant, il y a une limite à cette représentation, et qui est le nombre d'occurence de chacun des pays. Par exemple, nous avons 13 vins moldaves analysés, face à 3636 italiens. L'ordre de grandeur n'étant pas le même, la comparaison est moins pertinente.
+
+
+####9. Les notes attribuées au vin sont-elles cohérentes vis à vis des conditions météorologiques ou il y a t’il d’autres facteurs qui entrent en compte ? ( prix, popularité de la région de production, pays de provenance, réputé du vin…)
 
 Les notes des vins pourraient être influencées de manière biaisée par le prix ou la provenance géographique, indépendamment de la qualité réelle du vin. On s’attend à ce que les vins plus chers et issus de pays réputés soient en moyenne mieux notés.
 
@@ -166,11 +305,13 @@ ggplot(sparkling_subset, aes(x = Price, y = Rating)) +
   xlab("Prix (€)") +
   ylab("Note attribuée") +
   theme_minimal()
+```
 
-# On constate que le prix influence légèrement la note pour le vin rouge, mais ce n’est pas un facteur déterminant. Pour les autres types de vin, le prix n’est pas un bon indicateur de qualité perçue. Cela remet donc en question une idée reçue : les vins chers ne sont pas nécessairement mieux notés.
+On constate que le prix influence légèrement la note pour le vin rouge, mais ce n’est pas un facteur déterminant. Pour les autres types de vin, le prix n’est pas un bon indicateur de qualité perçue. Cela remet donc en question une idée reçue : les vins chers ne sont pas nécessairement mieux notés.
 
-# Voici des graphique boxplots montrant la relation entre la provenance et la note pour les vins rouges, blancs, rosés et pétilants. 
- 
+Voici des graphique boxplots montrant la relation entre la provenance et la note pour les vins rouges, blancs, rosés et pétilants. 
+
+ ```{r, echo=TRUE, warning=FALSE, message=FALSE}
 library(dplyr)
 
 red_subset <- subset(wines_fusionne, Type == "Red")
@@ -275,25 +416,6 @@ ggplot(sparkling_subset, aes(x = reorder(Country_FR, Rating, median), y = Rating
   ylab("Note attribuée") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-# On constate qu'il existe bien des effets de provenance : certains pays reçoivent systématiquement de meilleures notes. Mais cela n'est pas suffisant pour expliquer toutes les variations car certains pays moins connus ont des notes élevées ou encore, au sein d’un même pays, la dispersion des notes peut être importante. Il ne faut donc pas uniquement se fier à la provenance, ou comme vu précédemment le prix pour déterminer la qualié d'un vin. Nous nous interresserons donc par la suite à d'autres critèresz comme les conditions météorologiques et l'année de production.
-
 ```
-   
-10. Existe-t-il une relation entre la variabilité interannuelle des conditions météorologiques et la constance de la qualité des vins produits dans une région donnée ?
-- Nous nous attendons à observer que dans les régions où le climat varie peu d’une année à l’autre, la qualité du vin (mesurée par la note moyenne) est plus constante. Cela impliquerait que la stabilité climatique joue un rôle dans la régularité de la production vinicole. Le défi ici est de quantifier la variabilité climatique (écart-type sur plusieurs années) et de la corréler avec la variance des notes par région.
-- *_Graphique_* : Boxplot des notes par région avec écart-type climatique en couleur ou taille.
-- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
-- *_Features_* :  Region, Rating, Year, Jan_tavg à Dec_tavg (ou variables climatiques globales agrégées par an)
 
-11. Y a-t-il réellement des "bonnes années" où toutes les conditions météorologiques sont idéales pour tous les types de vin ? Les vignes cultivées dans des conditions optimales produisent elles des vins plus appréciés lors des notations ?
-- On s’attend à ce que certaines années se démarquent avec des conditions climatiques idéales (températures moyennes modérées, peu de précipitations pendant la floraison et la récolte, bon ensoleillement), et qu’elles soient associées à des notes plus élevées. On pourrait observer un pic global de notes dans ces “bonnes années”. Il faudra agréger les données météo sur l’année, les normaliser, puis les relier aux moyennes de notes par millésime.
-- *_Graphique_* : Courbe des notes moyennes par année avec superposition d’un indice climatique "optimal"
-- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
-- *_Features_* : Year, Rating, moyenne climat annuel (température moyenne, ensoleillement, précipitations)
-
-12. Peut-on prédire la popularité future d'un vin en fonction des conditions météorologiques de l'année de production ?
-- Nous pensons qu’il est possible de prédire une note approximative à partir des données climatiques de l’année de production. On pourrait utiliser un modèle de régression (linéaire ou non-linéaire) entraîné sur les températures, précipitations et ensoleillement de chaque mois, pour prédire la note. Un bon R² indiquerait que le climat est un prédicteur fiable de la qualité du vin.
-- *_Graphique_* : Courbe réelle vs prédite (scatter plot) + métrique de régression (R², MAE)
-- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
-- *_Features_* : Rating (à prédire), Jan à Dec (tavg, tmin, tmax, prcp, tsun)
+On constate qu'il existe bien des effets de provenance : certains pays reçoivent systématiquement de meilleures notes. Mais cela n'est pas suffisant pour expliquer toutes les variations car certains pays moins connus ont des notes élevées ou encore, au sein d’un même pays, la dispersion des notes peut être importante. Il ne faut donc pas uniquement se fier à la provenance, ou comme vu précédemment le prix pour déterminer la qualié d'un vin. Nous nous interresserons donc par la suite à d'autres critèresz comme les conditions météorologiques et l'année de production.
