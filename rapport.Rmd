@@ -224,7 +224,8 @@ ggplot(data = world_wine) +
 ```
 
 Avec cette représentation, on voit que l'Europe, l'Amérique du Nord, certains pays d'Amérique du Sud, l'Afrique du Sud, la Chine, l'Australie et l'Océanie sont représentés. Cependant, en regardant les couleurs, les notes moyennes des vins de ces pays producteurs sont plutôt proches, et les notes des pays les mieux notés se situent globalement entre 3,5 et 4,5. Avec cete représentation, il est difficile de voir les pays les mieux notés du monde. 
-#Nous allons donc effectuer une seconde représentation afin d'obtenir les pays les mieux notés mondialement.
+
+Nous allons donc effectuer une seconde représentation afin d'obtenir les pays les mieux notés mondialement.
 
 **Graphique 2 : Barplot (Population Chart)**
 ```{r}
