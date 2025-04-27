@@ -168,7 +168,7 @@ rose <- read_csv("Rose_Weather.csv",show_col_types = FALSE)
 sparkling <- read_csv("Sparkling_Weather.csv",show_col_types = FALSE)
 ```
 
-####4. Il y a t’il un pays producteur préféré à l’échelle mondiale ? 
+### 4. Il y a t’il un pays producteur préféré à l’échelle mondiale ? 
 
 Nous nous attendons à ce que l'Italie soit le pays producteur dont les vins sont les plus appréciés, car c'est le plus gros producteur du monde, mais aussi celui qui subit le moins de conditions météorologiques défavorables.
 
@@ -256,7 +256,7 @@ count_Moldova <- wine_data %>%
 Si l'on se base simplement sur les résultats que nous apportent les données, on pourrait en conclure que la Moldavie est le pays producteur de vin préféré à l'échelle mondiale. Cependant, il y a une limite à cette représentation, et qui est le nombre d'occurence de chacun des pays. Par exemple, nous avons 13 vins moldaves analysés, face à 3636 italiens. L'ordre de grandeur n'étant pas le même, la comparaison est moins pertinente.
 
 
-####9. Les notes attribuées au vin sont-elles cohérentes vis à vis des conditions météorologiques ou il y a t’il d’autres facteurs qui entrent en compte ? ( prix, popularité de la région de production, pays de provenance, réputé du vin…)
+### 9. Les notes attribuées au vin sont-elles cohérentes vis à vis des conditions météorologiques ou il y a t’il d’autres facteurs qui entrent en compte ? ( prix, popularité de la région de production, pays de provenance, réputé du vin…)
 
 Les notes des vins pourraient être influencées de manière biaisée par le prix ou la provenance géographique, indépendamment de la qualité réelle du vin. On s’attend à ce que les vins plus chers et issus de pays réputés soient en moyenne mieux notés.
 
@@ -311,7 +311,7 @@ On constate que le prix influence légèrement la note pour le vin rouge, mais c
 
 Voici des graphique boxplots montrant la relation entre la provenance et la note pour les vins rouges, blancs, rosés et pétilants. 
 
- ```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
 library(dplyr)
 
 red_subset <- subset(wines_fusionne, Type == "Red")
