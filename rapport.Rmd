@@ -166,6 +166,16 @@ red <- read_csv("Red_Weather.csv",show_col_types = FALSE)
 white <- read_csv("White_Weather.csv",show_col_types = FALSE)
 rose <- read_csv("Rose_Weather.csv",show_col_types = FALSE)
 sparkling <- read_csv("Sparkling_Weather.csv",show_col_types = FALSE)
+
+red_weather <- read_csv("Red_Weather.csv")
+white_weather <- read_csv("White_Weather.csv")
+rose_weather <- read_csv("Rose_Weather.csv")
+sparkling_weather <- read_csv("Sparkling_Weather.csv")
+red_weather <- red_weather %>% mutate(Type = "Red")
+white_weather <- white_weather %>% mutate(Type = "White")
+rose_weather <- rose_weather %>% mutate(Type = "Rosé")
+sparkling_weather <- sparkling_weather %>% mutate(Type = "Sparkling")
+wines_fusionne <- bind_rows(red_weather, white_weather, rose_weather, sparkling_weather)
 ```
 
 ### 4. Il y a t’il un pays producteur préféré à l’échelle mondiale ? 
