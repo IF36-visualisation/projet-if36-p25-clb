@@ -263,6 +263,12 @@ Mais la loi est-elle aussi simple que cela ? La lumière moyenne annuelle est-el
 **Graphique 4 et 5 : Scatterplot - Top countries - four Seasons Sunshine VS Rating - LOESS**
 
 ```{r question 3 - Graphique 4,5}
+long_seasonal_Red_Weather <- Red_Weather_top_countries %>%
+  select(Country, Rating, Spring_Sunshine, Summer_Sunshine, Autumn_Sunshine, Winter_Sunshine) %>%
+  pivot_longer(cols = starts_with(c("Spring", "Summer", "Autumn", "Winter")),
+               names_to = "Season",
+               values_to = "Sunshine")
+
 ggplot(long_seasonal_Red_Weather, aes(x = Sunshine, y = Rating, color = Season)) +
   geom_point(alpha = 0.5, size = 0.8) +
   geom_smooth(method = "loess", se = FALSE, span = 1, size = 0.8) +
