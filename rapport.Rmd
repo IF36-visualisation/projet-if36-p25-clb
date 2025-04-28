@@ -416,4 +416,58 @@ On constate que le prix influence légèrement la note pour le vin rouge, mais c
 
 L'analyse n'est donc pas complète, il faudra se penchez ensuite sur le lien entre la note et la provenance du vin.
 
+### 7. Y a-t-il des régions productrices davantage impactées par le changement climatique ? Si oui, cela apparaît-il dans la notation du vin ?
 
+On peut imaginer que certaines régions sont plus impactées que d'autres par le dérèglement climatique, et que des régions productrices en font partie. Nous souhaitons vérifier ceci en étudiant les différences de conditions météorologiques au fil des années et selon les régions. Puis, si certaines se démarquent, nous souhaitons étudier l'évolution des notations du vin en fonction des années pour vérifier s'il y a une corrélation. On peut imaginer que certaines régions qui sont davantage impactée par notamment la hausse des températures ou l'augmentation des précipitations auront des notations de vin en baisse au fil des années.
+
+Voici un scatterplot illustrant la relation entre les notes attribuées au vin et leurs pays d'origine. Il est compliqué d'envisager l'entierté de la question et ses enjeux à travers un seul graphique, étant donné qu'elle comprend plus de deux variables
+
+```{r question 7}
+
+# Fusionner tous les datasets
+wines_fusionne <- bind_rows(red, white, rose, sparkling)
+
+# Calcul des moyennes annuelles température + précipitations
+wines_fusionne <- wines_fusionne %>%
+  mutate(
+    Temp_Annuel = rowMeans(select(., ends_with("tavg")), na.rm = TRUE),
+    Precip_Annuel = rowSums(select(., ends_with("prcp")), na.rm = TRUE)
+  )
+
+# Préparer les données : moyenne température par Country et Year
+temp_moyenne <- wines_fusionne %>%
+  group_by(Country, Year) %>%
+  summarise(Temp_Moyenne = mean(Temp_Annuel, na.rm = TRUE)) %>%
+  ungroup()
+
+# Sélectionner les pays où l'augmentation de température est forte
+
+variation_temp <- temp_moyenne %>%
+  group_by(Country) %>%
+  summarise(
+    Temp_ancienne = mean(Temp_Moyenne[Year <= 2000], na.rm = TRUE),
+    Temp_recent = mean(Temp_Moyenne[Year >= 2010], na.rm = TRUE),
+    Diff = Temp_recent - Temp_ancienne
+  ) %>%
+  arrange(desc(Diff))
+
+# Voir les pays avec la plus forte hausse
+top_pays <- head(variation_temp$Country, 5)  # Garder les 5 pays les plus impactés
+top_pays
+
+# Filtrer les données pour les pays impactés
+wines_top_pays <- wines_fusionne %>%
+  filter(Country %in% top_pays)
+
+# Graphique : évolution des ratings
+ggplot(wines_top_pays, aes(x = Year, y = Rating, color = Country)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    title = "Évolution des Notes des Vins dans les Pays les Plus Impactés",
+    x = "Année",
+    y = "Note du Vin"
+  ) +
+  theme_minimal()
+
+On constate donc une baisse de la note des vins en général, particulièrement frappant pour le cas de l'Italie et de l'Australie, mais cette visualisation ne permet pas d'être précise car elle ne trace les lignes de tendance que de 3 pays. De plus, il faudrait croiser cette analyse avec une visualition de l'impact du changement climatique sur les différentes régions/ pays. 
