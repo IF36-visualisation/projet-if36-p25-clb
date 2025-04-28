@@ -330,35 +330,7 @@ country_ratings <- wine_data %>%
             count = n()) %>%
   arrange(desc(mean_rating))
 ```
-**Graphique 1 : Choropleth Map (carte colorée)**
 
-```{r qu4 graphique 1}
-# --- Graphique 1 : Choropleth Map (carte colorée) ---
-# Charger la carte du monde
-world <- ne_countries(scale = "medium", returnclass = "sf")
-
-# Fusionner les données des vins avec les données géographiques
-world_wine <- left_join(world, country_ratings, by = c("name" = "Country"))
-
-# Créer la carte choroplèthe
-ggplot(data = world_wine) +
-  geom_sf(aes(fill = mean_rating)) +
-  scale_fill_gradientn(
-    colours = c("yellow", "lightgreen", "skyblue", "orchid", "blue4"),
-    limits = c(0, 5),
-    na.value = "lightgrey"
-  ) +
-  labs(title = "Moyenne des notes de vin par pays",
-       fill = "Note moyenne",
-       caption = "Sources : Red, Rosé, White et Sparkling Weather") +
-  theme_minimal()
-```
-
-Avec cette représentation, on voit que l'Europe, l'Amérique du Nord, certains pays d'Amérique du Sud, l'Afrique du Sud, la Chine, l'Australie et l'Océanie sont représentés. Cependant, en regardant les couleurs, les notes moyennes des vins de ces pays producteurs sont plutôt proches, et les notes des pays les mieux notés se situent globalement entre 3,5 et 4,5. Avec cete représentation, il est difficile de voir les pays les mieux notés du monde. 
-
-Nous allons donc effectuer une seconde représentation afin d'obtenir les pays les mieux notés mondialement.
-
-**Graphique 2 : Barplot (Population Chart)**
 ```{r}
 # Top 10 des pays
 top_countries <- country_ratings %>%
