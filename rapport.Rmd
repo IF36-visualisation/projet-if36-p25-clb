@@ -182,7 +182,6 @@ wines_fusionne <- bind_rows(red_weather, white_weather, rose_weather, sparkling_
 -On peut imaginer que des raisins bénéficiant d’un ensoleillement important pendant certains mois clés (comme la période de maturation) produisent des vins mieux notés. Cependant, un ensoleillement excessif, accompagné de chaleur intense, pourrait entraîner une baisse de la qualité.
 
 **Traitement des données**
-
 ```{r question 3}
 Red_Weather <- read_csv("Red_Weather.csv")
 # Sélection des données nécessaires, simplification des tableaux
@@ -210,74 +209,17 @@ selected_Red_Weather_Annual_Sunshine <- selected_Red_Weather_Annual_Sunshine %>%
   mutate(Winter_Sunshine = (Jan_tsun + Feb_tsun + Dec_tsun)/3600)
 ```
 
-**Graphique 1 : Scatterplot - Annual Light Sum VS Rating - LOESS**
-
-```{r question 3 - Graphique 1 }
-ggplot(selected_Red_Weather_Annual_Sunshine, aes(x = Annual_Sunshine, y = Rating)) +
-  geom_point(alpha = 0.6) +  
-  geom_smooth(method = "loess", se = FALSE, span = 1, size = 0.8) +  
-  labs(title = "Annual Sunshine Duration vs Wine Rating",
-       x = "Annual Sunshine Duration(hours)",
-       y = "Wine Rating") +
-  theme_minimal()
-```
-
-Les notes des vins ont augmenté lorsque les niveaux de lumière ont été progressivement augmentés à partir d'un faible niveau au cours de l'année, se sont stabilisées lorsque des niveaux de lumière moyens ont été atteints, et ont légèrement diminué lorsque les niveaux de lumière étaient trop élevés. Ceci suggère qu'une exposition modérée à la lumière est favorable à la qualité du vin, alors qu'une exposition excessive à la lumière peut avoir un impact négatif sur la qualité du raisin. Toutefois, les conditions varient d'un pays à l'autre, et il est donc nécessaire d'examiner les tendances en matière de notation de la lumière dans différents pays.
-
-**Graphique 2 : Scatterplot - Différents pays différentes couleurs -Annual_Sunshine VS Rating**
-
-```{r question 3 - Graphique 2}
-ggplot(selected_Red_Weather_Annual_Sunshine, aes(x = Annual_Sunshine, y = Rating, color = Country)) +
-  geom_point(alpha = 0.6) +
-  labs(title = "Annual Sunshine Duration vs Wine Rating by Country",
-       x = "Annual Sunshine Duration (hours)",
-       y = "Wine Rating") +
-  theme_minimal()
-```
-
-Trop de pays mélangés pour pouvoir dégager des tendances. Les tailles d'échantillons pour certains pays sont trop faibles et il peut être difficile de discerner des tendances. On s'efforcera de sélectionner quelques pays dont les échantillons sont les plus importants pour l'observation.
-
-**Graphique 3 : Scatterplot - Top countries - Annual_Sunshine VS Rating - LOESS**
-
-```{r question 3 - Graphique 3}
-# Sélection des Top country
+**Graphique 1 : Scatterplot - Top countries - four Seasons Sunshine VS Rating - LOESS**
+```{r question 3 - Graphique 1}
 top_countries <- c("France", "Italy", "Spain", "United States")
 Red_Weather_top_countries <- selected_Red_Weather_Annual_Sunshine %>%
   filter(Country %in% top_countries)
 
-ggplot(Red_Weather_top_countries, aes(x = Annual_Sunshine, y = Rating, color = Country)) +
-  geom_point(alpha = 0.6) +
-  geom_smooth(method = "loess", se = FALSE, span = 1, size = 0.8) +
-  facet_wrap(~ Country)+
-  labs(title = "Annual Sunshine Duration vs Wine Rating by Country",
-       x = "Annual Sunshine Duration (hours)",
-       y = "Wine Rating") +
-  theme_minimal()
-
-```
-
-La France, l'Espagne et les États-Unis suivent le principe du "U inversé", selon lequel l'évaluation des vins augmente avec l'exposition à la lumière et diminue au-delà d'un certain seuil. L'Italie, en revanche, présente une tendance différente : la note diminue avec l'augmentation de l'exposition à la lumière.
-
-Mais la loi est-elle aussi simple que cela ? La lumière moyenne annuelle est-elle suffisante pour représenter fidèlement la lumière disponible aux stades clés de la croissance du raisin ? J'ai donc divisé la lumière annuelle en saisons pour tenter d'étudier l'effet de la lumière sur la notation des raisins au cours des différentes saisons.
-
-**Graphique 4 et 5 : Scatterplot - Top countries - four Seasons Sunshine VS Rating - LOESS**
-
-```{r question 3 - Graphique 4,5}
 long_seasonal_Red_Weather <- Red_Weather_top_countries %>%
   select(Country, Rating, Spring_Sunshine, Summer_Sunshine, Autumn_Sunshine, Winter_Sunshine) %>%
   pivot_longer(cols = starts_with(c("Spring", "Summer", "Autumn", "Winter")),
                names_to = "Season",
                values_to = "Sunshine")
-
-ggplot(long_seasonal_Red_Weather, aes(x = Sunshine, y = Rating, color = Season)) +
-  geom_point(alpha = 0.5, size = 0.8) +
-  geom_smooth(method = "loess", se = FALSE, span = 1, size = 0.8) +
-  facet_wrap(~ Country) +
-  labs(title = "Seasonal Sunshine Duration vs Wine Rating by Country (LOESS Fit)",
-       x = "Seasonal Sunshine Duration (hours)",
-       y = "Wine Rating") +
-  theme_minimal() +
-  theme(strip.text = element_text(size = 12, face = "bold"))
 
 ggplot(long_seasonal_Red_Weather, aes(x = Sunshine, y = Rating)) +
   geom_point(alpha = 0.5, size = 0.8, color = "steelblue") +
@@ -289,8 +231,7 @@ ggplot(long_seasonal_Red_Weather, aes(x = Sunshine, y = Rating)) +
   theme_minimal() +
   theme(strip.text = element_text(size = 10, face = "bold"))
 ```
-
-Nous pouvons constater que les courbes de régression de la cote de lumière sont différentes pour chaque saison. La France et les États-Unis suivent toujours le « principe du “U inversé” pendant la plupart des saisons. En Italie, en général, les notes de vin diminuent avec l'augmentation de la lumière au cours des quatre saisons. L'Espagne, en revanche, a suivi la même tendance que l'Italie en hiver et au printemps, mais a présenté un U inversé en été et en automne.
+Nous pouvons constater que les courbes de régression de la cote de lumière sont différentes pour chaque saison. La France et les États-Unis suivent le principe du 'U inversé' pendant la plupart des saisons. Ceci suggère qu'une exposition modérée à la lumière est favorable à la qualité du vin, alors qu'une exposition excessive à la lumière peut avoir un impact négatif sur la qualité du raisin. En Italie, en général, les notes de vin diminuent avec l'augmentation de la lumière au cours des quatre saisons. L'Espagne, en revanche, a suivi la même tendance que l'Italie en hiver et au printemps, mais a présenté un U inversé en été et en automne.
 
 La sensibilité de la qualité du vin à l'ensoleillement ne dépend pas uniquement de la quantité absolue de lumière solaire, mais aussi du climat de référence propre à chaque région. 
 
