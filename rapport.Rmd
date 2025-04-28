@@ -368,158 +368,52 @@ Voici des scatter plots montrant la relation entre le prix et la note pour les v
 
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
 library(ggplot2)
+library(patchwork)
+library(dplyr)
 
-# Filtrer les données pour retirer les outliers extrêmes (facultatif mais conseillé)
-red_subset <- subset(wines_fusionne, Type == "Red" & Price <= 200)
 
-ggplot(red_subset, aes(x = Price, y = Rating)) +
-  geom_point(color = "red", alpha = 0.6) +
-  geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed", fullrange = FALSE) +
-  ggtitle("Vin Rouge - Relation entre Prix et Note") +
-  xlab("Prix (€)") +
-  ylab("Note attribuée") +
-  theme_minimal()
+# Créer une colonne "Type_FR" pour avoir le nom français dans le graphique
+wines_fusionne$Type_FR <- recode(wines_fusionne$Type,
+                                 "Red" = "Vin Rouge",
+                                 "White" = "Vin Blanc",
+                                 "Rosé" = "Vin Rosé",
+                                 "Sparkling" = "Vin Pétillant")
 
-white_subset <- subset(wines_fusionne, Type == "White" & Price <= 200)
+# Base du plot générique
+base_plot <- function(data, color) {
+  ggplot(data, aes(x = Price, y = Rating, color = Type_FR)) +
+    geom_point(alpha = 0.6) +
+    geom_smooth(method = "lm", se = FALSE, linetype = "dashed", color = "black", fullrange = FALSE) +
+    scale_color_manual(values = color) +
+    xlab("Prix (€)") +
+    ylab("Note attribuée") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          plot.title = element_text(hjust = 0.5))
+}
 
-ggplot(white_subset, aes(x = Price, y = Rating)) +
-  geom_point(color = "gold", alpha = 0.6) +
-  geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed", fullrange = FALSE) +
-  ggtitle("Vin Blanc - Relation entre Prix et Note") +
-  xlab("Prix (€)") +
-  ylab("Note attribuée") +
-  theme_minimal()
+# Créer chaque graphique sans légende propre
+p1 <- base_plot(subset(wines_fusionne, Type == "Red" & Price <= 200), color = c("Vin Rouge" = "red")) +
+  ggtitle("Vin Rouge")
 
-rose_subset <- subset(wines_fusionne, Type == "Rosé" & Price <= 200)
+p2 <- base_plot(subset(wines_fusionne, Type == "White" & Price <= 200), color = c("Vin Blanc" = "gold")) +
+  ggtitle("Vin Blanc")
 
-ggplot(rose_subset, aes(x = Price, y = Rating)) +
-  geom_point(color = "pink", alpha = 0.6) +
-  geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed", fullrange = FALSE) +
-  ggtitle("Vin Rosé - Relation entre Prix et Note") +
-  xlab("Prix (€)") +
-  ylab("Note attribuée") +
-  theme_minimal()
+p3 <- base_plot(subset(wines_fusionne, Type == "Rosé" & Price <= 200), color = c("Vin Rosé" = "pink")) +
+  ggtitle("Vin Rosé")
 
-sparkling_subset <- subset(wines_fusionne, Type == "Sparkling" & Price <= 200)
+p4 <- base_plot(subset(wines_fusionne, Type == "Sparkling" & Price <= 200), color = c("Vin Pétillant" = "skyblue")) +
+  ggtitle("Vin Pétillant")
 
-ggplot(sparkling_subset, aes(x = Price, y = Rating)) +
-  geom_point(color = "skyblue", alpha = 0.6) +
-  geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed", fullrange = FALSE) +
-  ggtitle("Vin Pétillant - Relation entre Prix et Note") +
-  xlab("Prix (€)") +
-  ylab("Note attribuée") +
-  theme_minimal()
+# Combiner avec patchwork
+(p1 + p2 + p3 + p4) +
+  plot_layout(ncol = 2, guides = "collect") & 
+  plot_annotation(title = "Relation entre Prix et Note attribuée selon le Type de Vin") &
+  theme(legend.position = "bottom")
 ```
 
 On constate que le prix influence légèrement la note pour le vin rouge, mais ce n’est pas un facteur déterminant. Pour les autres types de vin, le prix n’est pas un bon indicateur de qualité perçue. Cela remet donc en question une idée reçue : les vins chers ne sont pas nécessairement mieux notés.
 
-Voici des graphique boxplots montrant la relation entre la provenance et la note pour les vins rouges, blancs, rosés et pétilants. 
-
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
-library(dplyr)
-
-red_subset <- subset(wines_fusionne, Type == "Red")
-red_subset$Country_FR <- recode(red_subset$Country,
-                                "Italy" = "Italie", "France" = "France", "Spain" = "Espagne", "Portugal" = "Portugal",
-                                "Germany" = "Allemagne", "United States" = "États-Unis", "Argentina" = "Argentine",
-                                "Chile" = "Chili", "Australia" = "Australie", "Austria" = "Autriche",
-                                "South Africa" = "Afrique du Sud", "New Zealand" = "Nouvelle-Zélande", "Greece" = "Grèce",
-                                "Canada" = "Canada", "Hungary" = "Hongrie", "Israel" = "Israël", "Switzerland" = "Suisse",
-                                "Romania" = "Roumanie", "Lebanon" = "Liban", "Croatia" = "Croatie", "Brazil" = "Brésil",
-                                "Uruguay" = "Uruguay", "Bulgaria" = "Bulgarie", "Turkey" = "Turquie", "Slovenia" = "Slovénie",
-                                "Mexico" = "Mexique", "Georgia" = "Géorgie", "Czech Republic" = "République Tchèque",
-                                "England" = "Angleterre", "Japan" = "Japon", "Moldova" = "Moldavie", "China" = "Chine",
-                                "India" = "Inde", "Peru" = "Pérou", "Morocco" = "Maroc", "Cyprus" = "Chypre", "Malta" = "Malte"
-)
-
-valid_countries <- names(table(red_subset$Country_FR))[table(red_subset$Country_FR) >= 5]
-red_subset <- subset(red_subset, Country_FR %in% valid_countries)
-
-ggplot(red_subset, aes(x = reorder(Country_FR, Rating, median), y = Rating)) +
-  geom_boxplot(fill = "lightcoral", color = "black") +
-  ggtitle("Vin Rouge - Répartition des Notes par Pays") +
-  xlab("Pays de provenance") +
-  ylab("Note attribuée") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+L'analyse n'est donc pas complète, il faudra se penchez ensuite sur le lien entre la note et la provenance du vin.
 
 
-white_subset <- subset(wines_fusionne, Type == "White")
-white_subset$Country_FR <- recode(white_subset$Country,
-                                  "Italy" = "Italie", "France" = "France", "Spain" = "Espagne", "Portugal" = "Portugal",
-                                  "Germany" = "Allemagne", "United States" = "États-Unis", "Argentina" = "Argentine",
-                                  "Chile" = "Chili", "Australia" = "Australie", "Austria" = "Autriche",
-                                  "South Africa" = "Afrique du Sud", "New Zealand" = "Nouvelle-Zélande", "Greece" = "Grèce",
-                                  "Canada" = "Canada", "Hungary" = "Hongrie", "Israel" = "Israël", "Switzerland" = "Suisse",
-                                  "Romania" = "Roumanie", "Lebanon" = "Liban", "Croatia" = "Croatie", "Brazil" = "Brésil",
-                                  "Uruguay" = "Uruguay", "Bulgaria" = "Bulgarie", "Turkey" = "Turquie", "Slovenia" = "Slovénie",
-                                  "Mexico" = "Mexique", "Georgia" = "Géorgie", "Czech Republic" = "République Tchèque",
-                                  "England" = "Angleterre", "Japan" = "Japon", "Moldova" = "Moldavie", "China" = "Chine",
-                                  "India" = "Inde", "Peru" = "Pérou", "Morocco" = "Maroc", "Cyprus" = "Chypre", "Malta" = "Malte"
-)
-
-valid_countries <- names(table(white_subset$Country_FR))[table(white_subset$Country_FR) >= 5]
-white_subset <- subset(white_subset, Country_FR %in% valid_countries)
-
-ggplot(white_subset, aes(x = reorder(Country_FR, Rating, median), y = Rating)) +
-  geom_boxplot(fill = "lightgoldenrod", color = "black") +
-  ggtitle("Vin Blanc - Répartition des Notes par Pays") +
-  xlab("Pays de provenance") +
-  ylab("Note attribuée") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-rose_subset <- subset(wines_fusionne, Type == "Rosé")
-rose_subset$Country_FR <- recode(rose_subset$Country,
-                                 "Italy" = "Italie", "France" = "France", "Spain" = "Espagne", "Portugal" = "Portugal",
-                                 "Germany" = "Allemagne", "United States" = "États-Unis", "Argentina" = "Argentine",
-                                 "Chile" = "Chili", "Australia" = "Australie", "Austria" = "Autriche",
-                                 "South Africa" = "Afrique du Sud", "New Zealand" = "Nouvelle-Zélande", "Greece" = "Grèce",
-                                 "Canada" = "Canada", "Hungary" = "Hongrie", "Israel" = "Israël", "Switzerland" = "Suisse",
-                                 "Romania" = "Roumanie", "Lebanon" = "Liban", "Croatia" = "Croatie", "Brazil" = "Brésil",
-                                 "Uruguay" = "Uruguay", "Bulgaria" = "Bulgarie", "Turkey" = "Turquie", "Slovenia" = "Slovénie",
-                                 "Mexico" = "Mexique", "Georgia" = "Géorgie", "Czech Republic" = "République Tchèque",
-                                 "England" = "Angleterre", "Japan" = "Japon", "Moldova" = "Moldavie", "China" = "Chine",
-                                 "India" = "Inde", "Peru" = "Pérou", "Morocco" = "Maroc", "Cyprus" = "Chypre", "Malta" = "Malte"
-)
-
-valid_countries <- names(table(rose_subset$Country_FR))[table(rose_subset$Country_FR) >= 5]
-rose_subset <- subset(rose_subset, Country_FR %in% valid_countries)
-
-ggplot(rose_subset, aes(x = reorder(Country_FR, Rating, median), y = Rating)) +
-  geom_boxplot(fill = "lightpink", color = "black") +
-  ggtitle("Vin Rosé - Répartition des Notes par Pays") +
-  xlab("Pays de provenance") +
-  ylab("Note attribuée") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-sparkling_subset <- subset(wines_fusionne, Type == "Sparkling")
-sparkling_subset$Country_FR <- recode(sparkling_subset$Country,
-                                      "Italy" = "Italie", "France" = "France", "Spain" = "Espagne", "Portugal" = "Portugal",
-                                      "Germany" = "Allemagne", "United States" = "États-Unis", "Argentina" = "Argentine",
-                                      "Chile" = "Chili", "Australia" = "Australie", "Austria" = "Autriche",
-                                      "South Africa" = "Afrique du Sud", "New Zealand" = "Nouvelle-Zélande", "Greece" = "Grèce",
-                                      "Canada" = "Canada", "Hungary" = "Hongrie", "Israel" = "Israël", "Switzerland" = "Suisse",
-                                      "Romania" = "Roumanie", "Lebanon" = "Liban", "Croatia" = "Croatie", "Brazil" = "Brésil",
-                                      "Uruguay" = "Uruguay", "Bulgaria" = "Bulgarie", "Turkey" = "Turquie", "Slovenia" = "Slovénie",
-                                      "Mexico" = "Mexique", "Georgia" = "Géorgie", "Czech Republic" = "République Tchèque",
-                                      "England" = "Angleterre", "Japan" = "Japon", "Moldova" = "Moldavie", "China" = "Chine",
-                                      "India" = "Inde", "Peru" = "Pérou", "Morocco" = "Maroc", "Cyprus" = "Chypre", "Malta" = "Malte"
-)
-
-valid_countries <- names(table(sparkling_subset$Country_FR))[table(sparkling_subset$Country_FR) >= 5]
-sparkling_subset <- subset(sparkling_subset, Country_FR %in% valid_countries)
-
-ggplot(sparkling_subset, aes(x = reorder(Country_FR, Rating, median), y = Rating)) +
-  geom_boxplot(fill = "lightskyblue", color = "black") +
-  ggtitle("Vin Pétillant - Répartition des Notes par Pays") +
-  xlab("Pays de provenance") +
-  ylab("Note attribuée") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
-
-On constate qu'il existe bien des effets de provenance : certains pays reçoivent systématiquement de meilleures notes. Mais cela n'est pas suffisant pour expliquer toutes les variations car certains pays moins connus ont des notes élevées ou encore, au sein d’un même pays, la dispersion des notes peut être importante. Il ne faut donc pas uniquement se fier à la provenance, ou comme vu précédemment le prix pour déterminer la qualié d'un vin. Nous nous interresserons donc par la suite à d'autres critèresz comme les conditions météorologiques et l'année de production.
