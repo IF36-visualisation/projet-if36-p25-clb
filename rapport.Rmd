@@ -244,7 +244,7 @@ Ainsi, pour les recherches futures, au lieu d'étudier séparément l'effet de l
 
 ### 4. Il y a t’il un pays producteur préféré à l’échelle mondiale ? 
 
-Nous nous attendons à ce que l'Italie soit le pays producteur dont les vins sont les plus appréciés, car c'est le plus gros producteur du monde, mais aussi celui qui subit le moins de conditions météorologiques défavorables.
+Nous nous attendons à ce que l'Italie soit le pays producteur dont les vins sont les plus appréciés, car c'est le plus gros producteur du monde, mais aussi celui qui subit le moins de conditions météorologiques défavorables. Pour vérifier cela, nous allons calculer la note moyenne attribuée aux vins provenant d'un même pays, afin de comparer les notes moyennes de chacuns des pays. Grâce à cela, nous pourrons obtenir le classement des pays selon les notes que leurs vins ont obtenus, et ainsi en déduire quel est ou quels sont les pays préférés à l'échelle mondiale.
 
 ```{r question 4}
 # Garder uniquement les colonnes utiles
