@@ -159,6 +159,7 @@ library(rnaturalearth)
 library(rnaturalearthdata)
 library(readr)
 library(viridis)
+library(tidyr)
 ```
 ```{r datasets, message=FALSE, warning=FALSE}
 # Import des datasets
@@ -231,6 +232,7 @@ ggplot(long_seasonal_Red_Weather, aes(x = Sunshine, y = Rating)) +
   theme_minimal() +
   theme(strip.text = element_text(size = 10, face = "bold"))
 ```
+
 Nous pouvons constater que les courbes de régression de la cote de lumière sont différentes pour chaque saison. La France et les États-Unis suivent le principe du 'U inversé' pendant la plupart des saisons. Ceci suggère qu'une exposition modérée à la lumière est favorable à la qualité du vin, alors qu'une exposition excessive à la lumière peut avoir un impact négatif sur la qualité du raisin. En Italie, en général, les notes de vin diminuent avec l'augmentation de la lumière au cours des quatre saisons. L'Espagne, en revanche, a suivi la même tendance que l'Italie en hiver et au printemps, mais a présenté un U inversé en été et en automne.
 
 La sensibilité de la qualité du vin à l'ensoleillement ne dépend pas uniquement de la quantité absolue de lumière solaire, mais aussi du climat de référence propre à chaque région. 
@@ -246,13 +248,13 @@ Nous nous attendons à ce que l'Italie soit le pays producteur dont les vins son
 
 ```{r question 4}
 # Garder uniquement les colonnes utiles
-red <- red %>% select(Country, Rating)
-rose <- rose %>% select(Country, Rating)
-sparkling <- sparkling %>% select(Country, Rating)
-white <- white %>% select(Country, Rating)
+red_qu4 <- red %>% select(Country, Rating)
+rose_qu4 <- rose %>% select(Country, Rating)
+sparkling_qu4 <- sparkling %>% select(Country, Rating)
+white_qu4 <- white %>% select(Country, Rating)
 
 # Fusionner les datasets
-wine_data <- bind_rows(red, rose, sparkling, white)
+wine_data <- bind_rows(red_qu4, rose_qu4, sparkling_qu4, white_qu4)
 
 # Nettoyer les données (ex: retirer NA)
 wine_data <- wine_data %>% filter(!is.na(Country), !is.na(Rating))
@@ -377,7 +379,7 @@ wines_fusionne <- wines_fusionne %>%
 
 # Préparer les données : moyenne température par Country et Year
 temp_moyenne <- wines_fusionne %>%
-  group_by(Country, Year) %>%
+  group_by(Country,Year) %>%
   summarise(Temp_Moyenne = mean(Temp_Annuel, na.rm = TRUE)) %>%
   ungroup()
 
@@ -410,5 +412,6 @@ ggplot(wines_top_pays, aes(x = Year, y = Rating, color = Country)) +
     y = "Note du Vin"
   ) +
   theme_minimal()
+```
 
 On constate donc une baisse de la note des vins en général, particulièrement frappant pour le cas de l'Italie et de l'Australie, mais cette visualisation ne permet pas d'être précise car elle ne trace les lignes de tendance que de 3 pays. De plus, il faudrait croiser cette analyse avec une visualition de l'impact du changement climatique sur les différentes régions/ pays. 
