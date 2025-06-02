@@ -746,7 +746,6 @@ Ce graphique juxtapose, pour chaque année entre 2004 et 2018, la note moyenne d
 
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
 # Graphiques complémentaires
-#grid.arrange(p2, p3, ncol = 1)
 print(p2)
 ```
 
