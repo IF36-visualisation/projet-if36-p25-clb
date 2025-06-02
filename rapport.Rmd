@@ -526,3 +526,234 @@ ggplot(wines_top_pays, aes(x = Year, y = Rating, color = Country)) +
 ```
 
 On constate donc une baisse de la note des vins en général, particulièrement frappant pour le cas de l'Italie et de l'Australie, mais cette visualisation ne permet pas d'être précise car elle ne trace les lignes de tendance que de 3 pays. De plus, il faudrait croiser cette analyse avec une visualition de l'impact du changement climatique sur les différentes régions/ pays. 
+
+### 11. Y a-t-il réellement des "bonnes années" où toutes les conditions météorologiques sont idéales pour tous les types de vin ? Les vignes cultivées dans des conditions optimales produisent elles des vins plus appréciés lors des notations ?
+
+On s’attend à ce que certaines années se démarquent avec des conditions climatiques idéales (températures moyennes modérées, peu de précipitations pendant la floraison et la récolte, bon ensoleillement), et qu’elles soient associées à des notes plus élevées. On pourrait observer un pic global de notes dans ces “bonnes années”. Il faudra agréger les données météo sur l’année, les normaliser, puis les relier aux moyennes de notes par millésime.
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+
+# Analyse des "bonnes années" viticoles : Conditions météorologiques vs Notes des vins
+
+library(tidyverse)
+library(ggplot2)
+library(scales)
+library(corrplot)
+library(gridExtra)
+library(dplyr)
+
+
+# 1. CHARGEMENT ET PRÉPARATION DES DONNÉES
+
+# Fonction pour charger et nettoyer les données météo par type de vin
+load_wine_data <- function(file_path, wine_type) {
+  data <- read.csv(file_path)
+  data$Type <- wine_type
+  return(data)
+}
+
+# Chargement des 4 datasets météo
+red_data <- load_wine_data("Red_Weather.csv", "Rouge")
+rose_data <- load_wine_data("Rose_Weather.csv", "Rosé")
+sparkling_data <- load_wine_data("Sparkling_Weather.csv", "Effervescent")
+white_data <- load_wine_data("White_Weather.csv", "Blanc")
+
+# Combinaison de tous les datasets
+all_wines <- bind_rows(red_data, rose_data, sparkling_data, white_data)
+
+# 2. CALCUL DE L'INDICE CLIMATIQUE OPTIMAL
+
+# Fonction pour calculer l'indice climatique optimal par année
+calculate_climate_index <- function(data) {
+  # Agrégation des données météo par année et type de vin
+  yearly_data <- data %>%
+    group_by(Year, Type) %>%
+    summarise(
+      # Températures moyennes (idéal : ni trop chaud, ni trop froid)
+      temp_moy = mean(c(Jan_tavg, Feb_tavg, Mar_tavg, Apr_tavg, May_tavg, Jun_tavg,
+                        Jul_tavg, Aug_tavg, Sep_tavg, Oct_tavg, Nov_tavg, Dec_tavg), na.rm = TRUE),
+      
+      # Précipitations critiques (faibles pendant floraison mai-juin et récolte sep-oct)
+      prcp_critique = mean(c(May_prcp, Jun_prcp, Sep_prcp, Oct_prcp), na.rm = TRUE),
+      
+      # Ensoleillement pendant la maturation (jul-sept)
+      ensol_maturation = mean(c(Jul_tsun, Aug_tsun, Sep_tsun), na.rm = TRUE),
+      
+      note_moyenne = mean(Rating, na.rm = TRUE),
+      
+      # Nombre d'observations
+      n_vins = n(),
+      .groups = 'drop'
+    ) %>%
+    filter(!is.na(note_moyenne) & n_vins >= 5) # Filtrer les années avec peu de données
+  
+  # Normalisation des variables météo (0-1, où 1 = optimal)
+  yearly_data <- yearly_data %>%
+    mutate(
+      # Température optimale : proche de 15°C (normalisation inversée pour l'écart)
+      temp_norm = 1 - abs(temp_moy - 15) / max(abs(temp_moy - 15), na.rm = TRUE),
+      
+      # Précipitations faibles = mieux (normalisation inversée)
+      prcp_norm = 1 - (prcp_critique - min(prcp_critique, na.rm = TRUE)) / 
+        (max(prcp_critique, na.rm = TRUE) - min(prcp_critique, na.rm = TRUE)),
+      
+      # Ensoleillement élevé = mieux
+      ensol_norm = (ensol_maturation - min(ensol_maturation, na.rm = TRUE)) / 
+        (max(ensol_maturation, na.rm = TRUE) - min(ensol_maturation, na.rm = TRUE))
+    ) %>%
+    # Calcul de l'indice climatique optimal (moyenne pondérée)
+    mutate(
+      indice_climatique = (temp_norm * 0.4 + prcp_norm * 0.35 + ensol_norm * 0.25) * 100
+    )
+  
+  return(yearly_data)
+}
+
+# Calcul des indices climatiques
+climate_data <- calculate_climate_index(all_wines)
+
+# 3. AGRÉGATION GLOBALE PAR ANNÉE (tous types confondus)
+
+global_yearly <- climate_data %>%
+  group_by(Year) %>%
+  summarise(
+    note_globale = weighted.mean(note_moyenne, n_vins, na.rm = TRUE),
+    indice_climatique_global = weighted.mean(indice_climatique, n_vins, na.rm = TRUE),
+    nb_vins_total = sum(n_vins, na.rm = TRUE),
+    .groups = 'drop'
+  ) %>%
+  filter(nb_vins_total >= 20) # Années avec suffisamment de données
+
+# 4. CRÉATION DES VISUALISATIONS
+
+# Graphique principal : Notes vs Indice climatique par année
+p1 <- ggplot(global_yearly, aes(x = Year)) +
+  # Aire de l'indice climatique en arrière-plan
+  geom_area(aes(y = indice_climatique_global/25), 
+            fill = "lightblue", alpha = 0.3) +
+  
+  # Courbe des notes moyennes
+  geom_line(aes(y = note_globale), 
+            color = "#8B0000", size = 1.2) +
+  geom_point(aes(y = note_globale, size = nb_vins_total), 
+             color = "#8B0000", alpha = 0.7) +
+  
+  # Courbe de l'indice climatique (échelle secondaire)
+  geom_line(aes(y = indice_climatique_global/25), 
+            color = "#1E90FF", size = 1, linetype = "dashed") +
+  
+  # Axes secondaires
+  scale_y_continuous(
+    name = "Note moyenne des vins",
+    limits = c(3.2, 4.2),
+    sec.axis = sec_axis(~ . * 25, name = "Indice climatique optimal (%)")
+  ) +
+  
+  scale_size_continuous(name = "Nombre de vins", range = c(2, 6)) +
+  
+  labs(
+    title = "Les \"Bonnes Années\" Viticoles : Météo Idéale vs Qualité des Vins",
+    subtitle = "Relation entre conditions climatiques optimales et notes moyennes par millésime",
+    x = "Année",
+    caption = "Sources : Données météorologiques et notations vins | Indice climatique basé sur température, précipitations et ensoleillement"
+  ) +
+  
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 11, hjust = 0.5),
+    axis.title.y.left = element_text(color = "#8B0000"),
+    axis.title.y.right = element_text(color = "#1E90FF"),
+    legend.position = "bottom",
+    panel.grid.minor = element_blank()
+  )
+
+# Graphique de corrélation
+correlation_coef <- cor(global_yearly$note_globale, 
+                        global_yearly$indice_climatique_global, 
+                        use = "complete.obs")
+
+p2 <- ggplot(global_yearly, aes(x = indice_climatique_global, y = note_globale)) +
+  geom_point(aes(size = nb_vins_total, color = Year), alpha = 0.7) +
+  geom_smooth(method = "lm", se = TRUE, color = "red", linetype = "dashed") +
+  
+  scale_color_gradient(low = "blue", high = "red", name = "Année") +
+  scale_size_continuous(name = "Nb vins", range = c(3, 8)) +
+  
+  labs(
+    title = sprintf("Corrélation Météo-Qualité (r = %.3f)", correlation_coef),
+    x = "Indice Climatique Optimal (%)",
+    y = "Note Moyenne des Vins",
+    subtitle = "Chaque point représente une année"
+  ) +
+  
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
+    legend.position = "right"
+  )
+
+# Analyse par type de vin
+p3 <- ggplot(climate_data, aes(x = Year, y = note_moyenne, color = Type)) +
+  geom_line(size = 1) +
+  geom_point(aes(size = n_vins), alpha = 0.6) +
+  
+  scale_color_manual(values = c("Rouge" = "#8B0000", "Blanc" = "#FFD700", 
+                                "Rosé" = "#FF69B4", "Effervescent" = "#00CED1")) +
+  scale_size_continuous(name = "Nb vins", range = c(1, 4)) +
+  
+  labs(
+    title = "Évolution des Notes par Type de Vin",
+    x = "Année",
+    y = "Note Moyenne",
+    color = "Type de Vin"
+  ) +
+  
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+# 5. IDENTIFICATION DES MEILLEURES ANNÉES
+
+# Top 5 des meilleures années (indice climatique)
+top_climate_years <- global_yearly %>%
+  arrange(desc(indice_climatique_global)) %>%
+  head(5) %>%
+  select(Year, indice_climatique_global, note_globale) %>%
+  mutate(rang_climat = row_number())
+
+# Top 5 des meilleures années (notes)
+top_rating_years <- global_yearly %>%
+  arrange(desc(note_globale)) %>%
+  head(5) %>%
+  select(Year, indice_climatique_global, note_globale) %>%
+  mutate(rang_note = row_number())
+
+print("=== TOP 5 DES ANNÉES - INDICE CLIMATIQUE ===")
+print(top_climate_years)
+
+print("=== TOP 5 DES ANNÉES - NOTES MOYENNES ===")
+print(top_rating_years)
+
+print(sprintf("=== CORRÉLATION GLOBALE : r = %.3f ===", correlation_coef))
+
+# 6. AFFICHAGE DES GRAPHIQUES
+
+# Graphique principal
+print(p1)
+```
+
+Ce graphique juxtapose, pour chaque année entre 2004 et 2018, la note moyenne des vins (axe de gauche, en rouge foncé) et l’indice climatique « idéal » (axe de droite, en bleu) en fonction du temps. On observe que, sur cette période, l’indice climatique optimal progresse globalement vers le bas : après un pic de 105 % autour de 2006, il se situe plutôt près de 95 % à partir de 2015, signe d’années légèrement moins « parfaites » du point de vue météo. En parallèle, la note moyenne des vins suit une tendance similaire : elle descend d’un peu plus de 4,10 en 2006 à environ 3,72 en 2017, avant de se redresser légèrement en 2018. La taille croissante des cercles illustre le nombre de vins notés, ce qui montre que les millésimes les plus récents ont aussi vu un volume d’évaluations plus conséquent. Au final, cette double courbe suggère que lorsque les conditions climatiques s’éloignent de l’optimum (baisse de l’indice), la qualité moyenne mesurée des vins décline sensiblement, confirmant qu’un « bon millésime » au niveau météo tend à générer des notes supérieures.
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+# Graphiques complémentaires
+#grid.arrange(p2, p3, ncol = 1)
+print(p2)
+```
+
+On observe une tendance claire : plus l’indice climatique optimal est élevé, plus la note moyenne des vins augmente (pente positive, r = 0,342). Toutefois, cette relation reste loin d’être parfaite, car des millésimes ayant un indice identique peuvent afficher des notes très disparates, ce qui traduit une dispersion marquée. Cela s’explique par la présence de nombreux facteurs complémentaires (terroir, cépage, pratiques viticoles, etc.) qui contribuent significativement à la qualité finale et limitent la force de la seule corrélation météorologique. Par ailleurs, on note une évolution temporelle intéressante : les années 2004–2007 (en bleu) se situent le plus souvent dans la zone « fort indice → bonne note », alors que les millésimes plus récents (en rouge) se concentrent autour d’un indice moyen (55–65 %) et présentent des notes légèrement inférieures. Au final, ce graphique confirme que la météo exerce un impact réel mais **modéré et pas complètement prédictif** : un bon millésime climatique augmente les chances d’obtenir une note élevée, sans pour autant garantir à lui seul le succès du vin.
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+print(p3)
+```
+
+la qualité moyenne évaluée des vins s’est globalement érodée au cours des quinze dernières années, et la hiérarchie traditionnelle (rouges + effervescents en tête, puis blancs, rosés) s’est estompée, pour laisser place aujourd’hui à une quasi-uniformisation autour de la note 3,80–3,90, toutes catégories confondues.
