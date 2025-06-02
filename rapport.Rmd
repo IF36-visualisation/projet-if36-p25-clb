@@ -756,4 +756,4 @@ On observe une tendance claire : plus l’indice climatique optimal est élevé,
 print(p3)
 ```
 
-la qualité moyenne évaluée des vins s’est globalement érodée au cours des quinze dernières années, et la hiérarchie traditionnelle (rouges + effervescents en tête, puis blancs, rosés) s’est estompée, pour laisser place aujourd’hui à une quasi-uniformisation autour de la note 3,80–3,90, toutes catégories confondues.
+La qualité moyenne évaluée des vins s’est globalement érodée au cours des quinze dernières années, et la hiérarchie traditionnelle (rouges + effervescents en tête, puis blancs, rosés) s’est estompée, pour laisser place aujourd’hui à une quasi-uniformisation autour de la note 3,80–3,90, toutes catégories confondues.
