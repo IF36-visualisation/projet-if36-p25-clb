@@ -756,3 +756,356 @@ print(p3)
 ```
 
 La qualité moyenne évaluée des vins s’est globalement érodée au cours des quinze dernières années, et la hiérarchie traditionnelle (rouges + effervescents en tête, puis blancs, rosés) s’est estompée, pour laisser place aujourd’hui à une quasi-uniformisation autour de la note 3,80–3,90, toutes catégories confondues.
+
+###12. Peut-on prédire la popularité future d'un vin en fonction des conditions météorologiques de l'année de production ?
+
+On examine ici les relations entre les données météorologiques (température, précipitations, ensoleillement) et les notes de qualité attribuées aux vins sur une période étendue.
+
+Hypothèse thermique : Les températures modérées favorisent la maturation optimale des raisins
+Hypothèse hydrique : Un équilibre des précipitations (ni trop sec, ni trop humide) améliore la qualité
+Hypothèse solaire : Un ensoleillement suffisant est nécessaire pour la photosynthèse et la concentration des sucres
+Hypothèse saisonnière : L'impact des conditions météo varie selon les périodes clés du cycle viticole
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+# Analyse Simple : Impact des Conditions Météorologiques sur les Notes des Vins
+# =============================================================================
+
+# Chargement des bibliothèques
+library(tidyverse)
+library(ggplot2)
+library(corrplot)
+library(gridExtra)
+library(GGally)
+
+# 1. CHARGEMENT DES DONNÉES
+# ==========================
+
+# Fonction pour charger les données
+load_wine_data <- function(file_path, wine_type) {
+  data <- read.csv(file_path)
+  data$Type <- wine_type
+  return(data)
+}
+
+# Chargement des 4 datasets
+red_data <- load_wine_data("Red_Weather.csv", "Rouge")
+rose_data <- load_wine_data("Rose_Weather.csv", "Rosé")
+sparkling_data <- load_wine_data("Sparkling_Weather.csv", "Effervescent")
+white_data <- load_wine_data("White_Weather.csv", "Blanc")
+
+# Combinaison de tous les datasets
+all_wines <- bind_rows(
+  red_data, 
+  rose_data, 
+  sparkling_data, 
+  white_data)
+
+# 2. CRÉATION DE VARIABLES MÉTÉO SIMPLES
+# =======================================
+
+wines_simple <- all_wines %>%
+  mutate(
+    # Températures moyennes par saison (°C)
+    Temp_Printemps = (Mar_tavg + Apr_tavg + May_tavg) / 3,
+    Temp_Ete = (Jun_tavg + Jul_tavg + Aug_tavg) / 3,
+    Temp_Automne = (Sep_tavg + Oct_tavg + Nov_tavg) / 3,
+    Temp_Annuelle = (Jan_tavg + Feb_tavg + Mar_tavg + Apr_tavg + May_tavg + Jun_tavg +
+                       Jul_tavg + Aug_tavg + Sep_tavg + Oct_tavg + Nov_tavg + Dec_tavg) / 12,
+    
+    # Précipitations totales par saison (mm)
+    Pluie_Printemps = Mar_prcp + Apr_prcp + May_prcp,
+    Pluie_Ete = Jun_prcp + Jul_prcp + Aug_prcp,
+    Pluie_Automne = Sep_prcp + Oct_prcp + Nov_prcp,
+    Pluie_Annuelle = Jan_prcp + Feb_prcp + Mar_prcp + Apr_prcp + May_prcp + Jun_prcp +
+      Jul_prcp + Aug_prcp + Sep_prcp + Oct_prcp + Nov_prcp + Dec_prcp,
+    
+    # Ensoleillement total par saison (heures)
+    Soleil_Printemps = Mar_tsun + Apr_tsun + May_tsun,
+    Soleil_Ete = Jun_tsun + Jul_tsun + Aug_tsun,
+    Soleil_Automne = Sep_tsun + Oct_tsun + Nov_tsun,
+    Soleil_Annuel = Jan_tsun + Feb_tsun + Mar_tsun + Apr_tsun + May_tsun + Jun_tsun +
+      Jul_tsun + Aug_tsun + Sep_tsun + Oct_tsun + Nov_tsun + Dec_tsun
+  ) %>%
+  # Suppression des valeurs manquantes
+  drop_na(Rating, Temp_Annuelle, Pluie_Annuelle, Soleil_Annuel) %>%
+  # Filtrage des années avec suffisamment de données
+  group_by(Year) %>%
+  filter(n() >= 10) %>%
+  ungroup()
+
+print(paste("Nombre de vins analysés :", nrow(wines_simple)))
+print(paste("Période d'analyse :", min(wines_simple$Year), "-", max(wines_simple$Year)))
+
+# 3. STATISTIQUES DESCRIPTIVES
+# =============================
+
+print("=== STATISTIQUES GÉNÉRALES ===")
+summary_stats <- wines_simple %>%
+  summarise(
+    Note_moyenne = round(mean(Rating), 2),
+    Note_min = round(min(Rating), 2),
+    Note_max = round(max(Rating), 2),
+    Temp_moyenne = round(mean(Temp_Annuelle), 1),
+    Pluie_moyenne = round(mean(Pluie_Annuelle), 0),
+    Soleil_moyen = round(mean(Soleil_Annuel), 0)
+  )
+print(summary_stats)
+
+# 4. CORRÉLATIONS ENTRE MÉTÉO ET NOTES
+# =====================================
+
+# Sélection des variables pour l'analyse de corrélation
+meteo_vars <- wines_simple %>%
+  select(Rating, Temp_Annuelle, Temp_Printemps, Temp_Ete, Temp_Automne,
+         Pluie_Annuelle, Pluie_Printemps, Pluie_Ete, Pluie_Automne,
+         Soleil_Annuel, Soleil_Printemps, Soleil_Ete, Soleil_Automne)
+
+# Calcul des corrélations
+correlations <- cor(meteo_vars, use = "complete.obs")
+
+# Affichage des corrélations avec Rating
+rating_correlations <- correlations[,"Rating"] %>%
+  sort(decreasing = TRUE) %>%
+  round(3)
+
+print("=== CORRÉLATIONS AVEC LES NOTES ===")
+for(i in 2:length(rating_correlations)) {
+  var_name <- names(rating_correlations)[i]
+  corr_value <- rating_correlations[i]
+  print(paste(var_name, ":", corr_value))
+}
+
+# 5. VISUALISATIONS PRINCIPALES
+# ==============================
+
+# Graphique 1: Matrice de corrélation
+corrplot(correlations, method = "color", type = "upper", 
+         order = "hclust", tl.cex = 0.7, tl.col = "black",
+         title = "Corrélations entre Variables Météo et Notes",
+         mar = c(0,0,2,0))
+
+# Graphique 2: Relations météo vs notes (scatter plots)
+p1 <- ggplot(wines_simple, aes(x = Temp_Annuelle, y = Rating)) +
+  geom_point(aes(color = Type), alpha = 0.6) +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Température Annuelle vs Note du Vin",
+       x = "Température Moyenne Annuelle (°C)",
+       y = "Note du Vin",
+       color = "Type") +
+  theme_minimal()
+
+p2 <- ggplot(wines_simple, aes(x = Pluie_Annuelle, y = Rating)) +
+  geom_point(aes(color = Type), alpha = 0.6) +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Précipitations Annuelles vs Note du Vin",
+       x = "Précipitations Totales (mm)",
+       y = "Note du Vin",
+       color = "Type") +
+  theme_minimal()
+
+p3 <- ggplot(wines_simple, aes(x = Soleil_Annuel, y = Rating)) +
+  geom_point(aes(color = Type), alpha = 0.6) +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Ensoleillement Annuel vs Note du Vin",
+       x = "Ensoleillement Total (heures)",
+       y = "Note du Vin",
+       color = "Type") +
+  theme_minimal()
+
+# 6. ANALYSE PAR SAISONS
+# ======================
+
+# Corrélations saisonnières
+saison_correlations <- data.frame(
+  Saison = c("Printemps", "Été", "Automne"),
+  Temp_Corr = c(cor(wines_simple$Temp_Printemps, wines_simple$Rating),
+                cor(wines_simple$Temp_Ete, wines_simple$Rating),
+                cor(wines_simple$Temp_Automne, wines_simple$Rating)),
+  Pluie_Corr = c(cor(wines_simple$Pluie_Printemps, wines_simple$Rating),
+                 cor(wines_simple$Pluie_Ete, wines_simple$Rating),
+                 cor(wines_simple$Pluie_Automne, wines_simple$Rating)),
+  Soleil_Corr = c(cor(wines_simple$Soleil_Printemps, wines_simple$Rating),
+                  cor(wines_simple$Soleil_Ete, wines_simple$Rating),
+                  cor(wines_simple$Soleil_Automne, wines_simple$Rating))
+) %>%
+  mutate(across(ends_with("_Corr"), round, 3))
+
+print("=== CORRÉLATIONS PAR SAISON ===")
+print(saison_correlations)
+
+# Graphique des corrélations saisonnières avec couleurs personnalisées
+saison_long <- saison_correlations %>%
+  pivot_longer(cols = ends_with("_Corr"), 
+               names_to = "Variable", 
+               values_to = "Correlation") %>%
+  mutate(Variable = str_remove(Variable, "_Corr"))
+
+p6 <- ggplot(saison_long, aes(x = Saison, y = Correlation, fill = Variable)) +
+  geom_col(position = "dodge", alpha = 0.8) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = c("Pluie" = "blue", "Soleil" = "yellow", "Temp" = "red")) +
+  labs(title = "Impact Saisonnier des Conditions Météo sur les Notes",
+       x = "Saison",
+       y = "Corrélation avec la Note",
+       fill = "Variable Météo") +
+  theme_minimal()
+
+# 7. MODÈLE PRÉDICTIF SIMPLE
+# ===========================
+
+# Régression linéaire simple avec les 3 variables principales
+model_simple <- lm(Rating ~ Temp_Annuelle + Pluie_Annuelle + Soleil_Annuel, 
+                   data = wines_simple)
+
+# Prédictions
+wines_simple$Rating_Predit <- predict(model_simple, wines_simple)
+
+# Métriques du modèle
+r2 <- summary(model_simple)$r.squared
+mae <- mean(abs(wines_simple$Rating - wines_simple$Rating_Predit))
+rmse <- sqrt(mean((wines_simple$Rating - wines_simple$Rating_Predit)^2))
+
+print("=== MODÈLE PRÉDICTIF SIMPLE ===")
+print(paste("R² (variance expliquée) :", round(r2, 4)))
+print(paste("Erreur absolue moyenne (MAE) :", round(mae, 3)))
+print(paste("Erreur quadratique (RMSE) :", round(rmse, 3)))
+
+# 8. AFFICHAGE DES GRAPHIQUES
+# ============================
+
+print("Affichage des visualisations...")
+
+# Graphiques principaux 
+print(p1)
+```
+
+Cette matrice de corrélation met en lumière l’intensité des corrélations entre toutes les variables météorologiques et les notes de qualité : les couleurs chaudes (rouge/orange) indiquent des liens positifs forts, les nuances froides (bleu) signalent des corrélations négatives. Cette représentation permet d’identifier rapidement les variables météo les plus influentes, de repérer les redondances – par exemple l’intercorrélation fréquente des températures saisonnières.
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+print(p2)
+```
+On observe un nuage de points colorés par type de vin avec droite de régression. La pente de la droite indique la direction et l'intensité de la relation. La dispersion des points révèle la variabilité non expliquée et es intervalles de confiance montrent la fiabilité de la tendance. La pente négative révèle une légère tendance selon laquelle les années plus fraîches sont associées à une meilleure qualité. 
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+print(p3)
+```
+On oberve ici une corrélation positive donc un apport hydrique suffisant favorise la maturation.
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+print(p6)
+```
+
+Ce qu'on observe :
+
+Barres colorées comparant l'impact de chaque variable météo par saison
+Bleu (Pluie) : Impact des précipitations saisonnières
+Jaune (Soleil) : Influence de l'ensoleillement saisonnier
+Rouge (Température) : Effet des températures saisonnières
+Ligne de référence à zéro pour identifier les impacts positifs/négatifs
+
+Interprétations saisonnières détaillées :
+Printemps (Mars-Mai) :
+
+Période de débourrement et de croissance végétative
+Impact variable selon les conditions : températures douces favorables, excès d'eau défavorable
+[À compléter avec vos données : "La température printanière montre un impact positif (r=0.23) tandis que les pluies printanières sont négativement corrélées (r=-0.15)"]
+
+Été (Juin-Août) :
+
+Période critique de maturation des raisins
+Généralement la saison la plus influente sur la qualité finale
+[À compléter : "L'ensoleillement estival présente l'impact le plus fort (r=0.52), confirmant l'importance de cette période pour la photosynthèse"]
+
+Automne (Septembre-Novembre) :
+
+Période de vendange et de finalisation de la maturation
+Conditions sèches généralement favorables
+[À compléter : "Les précipitations automnales montrent un impact négatif marqué (r=-0.38), reflétant les risques de dilution et de maladies"]
+
+Conclusions du graphique saisonnier :
+
+Identification de la saison critique : [Été/Automne] apparaît comme la période la plus déterminante
+Hiérarchisation des facteurs : [Ensoleillement/Température] semble plus important que les précipitations
+Effets différentiels : L'impact des mêmes conditions varie selon la saison
+
+Si la météorologie constitue un facteur significatif de la qualité viticole, elle ne représente qu'une composante d'un système complexe. L'excellence du vin résulte de l'interaction harmonieuse entre conditions climatiques favorables et savoir-faire humain, rappelant que derrière chaque grand millésime se cachent autant l'art du vigneron que les caprices de la nature.
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+# 9. ANALYSE DES ANNÉES EXCEPTIONNELLES
+# ======================================
+
+# Évolution des notes par année (calcul conservé pour l'analyse)
+yearly_stats <- wines_simple %>%
+  group_by(Year) %>%
+  summarise(
+    Note_moyenne = mean(Rating),
+    Temp_moyenne = mean(Temp_Annuelle),
+    Pluie_moyenne = mean(Pluie_Annuelle),
+    Soleil_moyen = mean(Soleil_Annuel),
+    n_vins = n(),
+    .groups = 'drop'
+  )
+
+# Identification des meilleures et pires années
+best_years <- yearly_stats %>%
+  arrange(desc(Note_moyenne)) %>%
+  head(5)
+
+worst_years <- yearly_stats %>%
+  arrange(Note_moyenne) %>%
+  head(5)
+
+print("=== TOP 5 MEILLEURES ANNÉES ===")
+print(best_years %>% select(Year, Note_moyenne, Temp_moyenne, Pluie_moyenne, Soleil_moyen))
+
+print("=== TOP 5 PIRES ANNÉES ===")
+print(worst_years %>% select(Year, Note_moyenne, Temp_moyenne, Pluie_moyenne, Soleil_moyen))
+
+# 10. CONCLUSIONS SIMPLES
+# ========================
+
+print("=== CONCLUSIONS ===")
+
+# Variable la plus corrélée
+best_correlation <- names(rating_correlations)[which.max(abs(rating_correlations[-1]))]
+best_corr_value <- max(abs(rating_correlations[-1]))
+
+print(paste("1. Variable météo la plus influente :", best_correlation))
+print(paste("   Corrélation :", round(best_corr_value, 3)))
+
+if(best_corr_value > 0.3) {
+  print("   → Impact FORT sur la qualité du vin")
+} else if(best_corr_value > 0.15) {
+  print("   → Impact MODÉRÉ sur la qualité du vin")
+} else {
+  print("   → Impact FAIBLE sur la qualité du vin")
+}
+
+print(paste("2. Capacité prédictive globale (R²) :", round(r2, 3)))
+if(r2 > 0.25) {
+  print("   → La météo explique une part SIGNIFICATIVE de la qualité")
+} else if(r2 > 0.10) {
+  print("   → La météo a un effet MODÉRÉ sur la qualité")
+} else {
+  print("   → La météo a un effet LIMITÉ sur la qualité")
+}
+
+print("3. Recommandations :")
+if(rating_correlations["Temp_Annuelle"] > 0) {
+  print("   → Les années plus chaudes tendent à produire de meilleurs vins")
+} else {
+  print("   → Les années plus fraîches tendent à produire de meilleurs vins")
+}
+
+if(rating_correlations["Pluie_Annuelle"] > 0) {
+  print("   → Plus de précipitations = meilleure qualité")
+} else {
+  print("   → Moins de précipitations = meilleure qualité")
+}
+
+if(rating_correlations["Soleil_Annuel"] > 0) {
+  print("   → Plus d'ensoleillement = meilleure qualité")
+} else {
+  print("   → Moins d'ensoleillement = meilleure qualité")
+}
+```
