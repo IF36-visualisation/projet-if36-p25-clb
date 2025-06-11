@@ -761,6 +761,75 @@ ggplot(wines_top_pays, aes(x = Year, y = Rating, color = Country)) +
 
 On constate donc une baisse de la note des vins en général, particulièrement frappant pour le cas de l'Italie et de l'Australie, mais cette visualisation ne permet pas d'être précise car elle ne trace les lignes de tendance que de 3 pays. De plus, il faudrait croiser cette analyse avec une visualition de l'impact du changement climatique sur les différentes régions/ pays. 
 
+### 8. Y a-t-il une corrélation entre les conditions météorologiques et les préférences des consommateurs pour certains types de vin ?
+- On peut imaginer que les raisins des vins préférés par les consommateurs ont poussé dans des conditions météorologiques similaires. Pour aller plus loin, nous pouvons étudier si c'est le cas pour tous les types de vin.
+
+Pour répondre à cette question, nous allons analyser les corrélations entre les conditions météorologiques et les notes attribuées aux différents types de vin. Nous allons étudier les corrélations par rapport aux températures moyennes, aux précipitations et à l'ensoleillement.
+
+
+*Graphique : Scatter plot, en étudiant les conditions météorologiques en fonction des notations pour chaque type de vin. Nous pouvons étudier les corrélations par rapport aux températures moyennes, selon les précipitations, et selon l'ensoleillement.*
+
+{r question 8}
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+# Charger les données
+red <- read_csv("Red_Weather.csv") %>% mutate(Type = "Red")
+white <- read_csv("White_Weather.csv") %>% mutate(Type = "White")
+rose <- read_csv("Rose_Weather.csv") %>% mutate(Type = "Rose")
+sparkling <- read_csv("Sparkling_Weather.csv") %>% mutate(Type = "Sparkling")
+
+# Fusionner les datasets
+wines <- bind_rows(red, white, rose, sparkling)
+
+# Calculer les moyennes annuelles pour chaque type de vin
+wines_summary <- wines %>%
+  group_by(Type, Year) %>%
+  summarise(
+    Avg_Rating = mean(Rating, na.rm = TRUE),
+    Avg_Temp = mean(c_across(ends_with("_tavg")), na.rm = TRUE),
+    Avg_Precip = mean(c_across(ends_with("_prcp")), na.rm = TRUE),
+    Avg_Sunshine = mean(c_across(ends_with("_tsun")), na.rm = TRUE),
+    .groups = "drop"
+  )
+# Créer les scatter plots
+p1 <- ggplot(wines_summary, aes(x = Avg_Temp, y = Avg_Rating, color = Type)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Température moyenne annuelle vs Note moyenne",
+       x = "Température moyenne annuelle (°C)",
+       y = "Note moyenne") +
+  theme_minimal()
+
+p2 <- ggplot(wines_summary, aes(x = Avg_Precip, y = Avg_Rating, color = Type)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Précipitations moyennes annuelles vs Note moyenne",
+       x = "Précipitations moyennes annuelles (mm)",
+       y = "Note moyenne") +
+  theme_minimal()
+
+p3 <- ggplot(wines_summary, aes(x = Avg_Sunshine, y = Avg_Rating, color = Type)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Ensoleillement moyen annuel vs Note moyenne",
+       x = "Ensoleillement moyen annuel (heures)",
+       y = "Note moyenne") +
+  theme_minimal()
+
+# Afficher les graphiques
+print(p1)
+print(p2)
+print(p3)
+
+Les scatter plots montrent que les températures modérées sont généralement associées à des notes plus élevées, particulièrement pour les vins rouges et blancs, suggérant que ces types de vin bénéficient de conditions climatiques équilibrées. Concernant les précipitations, un niveau modéré semble favoriser des notes plus élevées, tandis qu'un excès ou un manque de précipitations peut nuire à la qualité du vin. Enfin, un ensoleillement modéré à élevé est généralement associé à des notes plus élevées, bien qu'un ensoleillement excessif puisse parfois avoir un impact négatif.
+
+Ces observations indiquent que les conditions météorologiques jouent un rôle significatif dans la qualité perçue des vins.
+
+
+
 ### 11. Y a-t-il réellement des "bonnes années" où toutes les conditions météorologiques sont idéales pour tous les types de vin ? Les vignes cultivées dans des conditions optimales produisent elles des vins plus appréciés lors des notations ?
 
 On s’attend à ce que certaines années se démarquent avec des conditions climatiques idéales (températures moyennes modérées, peu de précipitations pendant la floraison et la récolte, bon ensoleillement), et qu’elles soient associées à des notes plus élevées. On pourrait observer un pic global de notes dans ces “bonnes années”. Il faudra agréger les données météo sur l’année, les normaliser, puis les relier aux moyennes de notes par millésime.
