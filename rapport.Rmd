@@ -1,13 +1,18 @@
-  ---
+---
 title: "Rapport"
 output:
+  pdf_document:
+    latex_engine: xelatex
+    keep_tex: true
   html_document: default
-  pdf_document: default
+knitr:
+  opts_chunk:
+    echo: false
 date: "2024-05-05"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 # Rapport - Analyse de la qualité de différents vins et des conditions météorologiques des régions de production
 
@@ -112,23 +117,24 @@ L'analyse des types de données et de leur description nous a amené à nous pos
 - *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
 - *_Features_* : Region, Rating, Year, Price, Winery, Jan_tavg, Feb_tavg, Mar_tavg, Apr_tavg, May_tavg, Jun_tavg, Jul_tavg, Aug_tavg, Sep_tavg, Oct_tavg, Nov_tavg, Dec_tavg
 
-7. Y a-t-il des régions productrices davantage impactées par le changement climatique ? Si oui, cela apparaît-il dans la notation du vin ?
+7. Les notes attribuées au vin sont-elles cohérentes vis à vis des conditions météorologiques ou il y a t’il d’autres facteurs qui entrent en compte ? ( prix, popularité de la région de production, pays de provenance, réputé du vin…)
+- On peut imaginer que certains vins sont mieux notés parce qu'ils coûtent plus cher, ou parce qu'ils proviennent d'un pays en particulier.
+- *_Graphique_* : Scatter plot, en étudiant la notation des vins selon le prix/le pays de provenance pour chaque type de vin
+- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
+- *_Features_* : Rating, Price, Country
+
+8. Y a-t-il des régions productrices davantage impactées par le changement climatique ? Si oui, cela apparaît-il dans la notation du vin ?
 - On peut imaginer que certaines régions sont plus impactées que d'autres par le dérèglement climatique, et que des régions productrices en font partie. Nous souhaitons vérifier ceci en étudiant les différences de conditions météorologiques au fil des années et selon les régions. Puis, si certaines se démarquent, nous souhaitons étudier l'évolution des notations du vin en fonction des années pour vérifier s'il y a une corrélation. On peut imaginer que certaines régions qui sont davantage impactée par notamment la hausse des températures ou l'augmentation des précipitations auront des notations de vin en baisse au fil des années.
 - *_Graphique_* : Analyse des tendances climatiques -> heatmap avec la région, les années, la température moyenne/les précipitations ; corrélation avec la notation -> nuage de points sur les pays ciblés par les changements climatiques 
 - *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
 - *_Features_* : Country, Rating, Year, Jan_tavg, Jan_prcp, Feb_tavg, Feb_prcp, Mar_tavg, Mar_prcp, Apr_tavg, Apr_prcp, May_tavg, May_prcp, Jun_tavg, Jun_prcp, Jul_tavg, Jul_prcp, Aug_tavg, Aug_prcp, Sep_tavg, Sep_prcp, Oct_tavg, Oct_prcp, Nov_tavg, Nov_prcp, Dec_tavg, Dec_prcp
 
-8. Y a-t-il une corrélation entre les conditions météorologiques et les préférences des consommateurs pour certains types de vin ?
+9. Y a-t-il une corrélation entre les conditions météorologiques et les préférences des consommateurs pour certains types de vin ?
 - On peut imaginer que les raisins des vins préférés par les consommateurs ont poussé dans des conditions météorologiques similaires. Pour aller plus loin, nous pouvons étudier si c'est le cas pour tous les types de vin.
 - *_Graphique_* : Scatter plot, en étudiant les conditions météorologiques en fonction des notations pour chaque type de vin. Nous pouvons étudier les corrélations par rapport aux températures moyennes, selon les précipitations, et selon l'ensoleillement.
 - *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
 - *_Features_* : Rating, Jan à Dec (tavg, prcp, tsun)
 
-9. Les notes attribuées au vin sont-elles cohérentes vis à vis des conditions météorologiques ou il y a t’il d’autres facteurs qui entrent en compte ? ( prix, popularité de la région de production, pays de provenance, réputé du vin…)
-- On peut imaginer que certains vins sont mieux notés parce qu'ils coûtent plus cher, ou parce qu'ils proviennent d'un pays en particulier.
-- *_Graphique_* : Scatter plot, en étudiant la notation des vins selon le prix/le pays de provenance pour chaque type de vin
-- *_Dataset_* : Red_Weather.csv, Rose_Weather.csv, Sparkling_Weather.csv, White_Weather.csv
-- *_Features_* : Rating, Price, Country
  
 10. Existe-t-il une relation entre la variabilité interannuelle des conditions météorologiques et la constance de la qualité des vins produits dans une région donnée ?
 - Nous nous attendons à observer que dans les régions où le climat varie peu d’une année à l’autre, la qualité du vin (mesurée par la note moyenne) est plus constante. Cela impliquerait que la stabilité climatique joue un rôle dans la régularité de la production vinicole. Le défi ici est de quantifier la variabilité climatique (écart-type sur plusieurs années) et de la corréler avec la variance des notes par région.
@@ -150,7 +156,7 @@ L'analyse des types de données et de leur description nous a amené à nous pos
 
 ## Analyse Exploratoire
 
-```{r librairies, message=FALSE, warning=FALSE}
+```{r librairies, echo= FALSE, message=FALSE, warning=FALSE}
 # Import des librairies
 library(ggplot2)
 library(dplyr)
@@ -160,8 +166,6 @@ library(rnaturalearthdata)
 library(readr)
 library(viridis)
 library(tidyr)
-```
-```{r datasets, message=FALSE, warning=FALSE}
 # Import des datasets
 red <- read_csv("Red_Weather.csv",show_col_types = FALSE)
 white <- read_csv("White_Weather.csv",show_col_types = FALSE)
@@ -183,7 +187,7 @@ wines_fusionne <- bind_rows(red_weather, white_weather, rose_weather, sparkling_
 -On peut imaginer que des raisins bénéficiant d’un ensoleillement important pendant certains mois clés (comme la période de maturation) produisent des vins mieux notés. Cependant, un ensoleillement excessif, accompagné de chaleur intense, pourrait entraîner une baisse de la qualité.
 
 **Traitement des données**
-```{r question 3}
+```{r question3a, echo= FALSE}
 Red_Weather <- read_csv("Red_Weather.csv")
 # Sélection des données nécessaires, simplification des tableaux
 selected_Red_Weather <- Red_Weather %>%
@@ -211,7 +215,7 @@ selected_Red_Weather_Annual_Sunshine <- selected_Red_Weather_Annual_Sunshine %>%
 ```
 
 **Graphique 1 : Scatterplot - Top countries - four Seasons Sunshine VS Rating - LOESS**
-```{r question 3 - Graphique 1}
+```{r question3B, echo= FALSE}
 top_countries <- c("France", "Italy", "Spain", "United States")
 Red_Weather_top_countries <- selected_Red_Weather_Annual_Sunshine %>%
   filter(Country %in% top_countries)
@@ -246,7 +250,7 @@ Ainsi, pour les recherches futures, au lieu d'étudier séparément l'effet de l
 
 Nous nous attendons à ce que l'Italie soit le pays producteur dont les vins sont les plus appréciés, car c'est le plus gros producteur du monde, mais aussi celui qui subit le moins de conditions météorologiques défavorables. Pour vérifier cela, nous allons calculer la note moyenne attribuée aux vins provenant d'un même pays, afin de comparer les notes moyennes de chacuns des pays. Grâce à cela, nous pourrons obtenir le classement des pays selon les notes que leurs vins ont obtenus, et ainsi en déduire quel est ou quels sont les pays préférés à l'échelle mondiale.
 
-```{r question 4}
+```{r question4a, echo= FALSE}
 # Garder uniquement les colonnes utiles
 red_qu4 <- red %>% select(Country, Rating)
 rose_qu4 <- rose %>% select(Country, Rating)
@@ -274,7 +278,7 @@ country_ratings <- wine_data %>%
   arrange(desc(mean_rating))
 ```
 
-```{r}
+```{r, echo= FALSE}
 # Top 10 des pays
 top_countries <- country_ratings %>%
   top_n(10, mean_rating)
@@ -307,7 +311,7 @@ Si l'on se base simplement sur les résultats que nous apportent les données, o
 - On peut imaginer que les régions disposant des mêmes conditions météorologiques reçoivent les mêmes notes. Le problème que l'on pourrait rencontrer serait celui de l'influence d'autres facteurs comme le prix, ou la réputation de la région.
 
 **Traitement des données**
-```{r question 3}
+```{r question5a, echo= FALSE}
 library(dplyr)
 library(readr)
 library(ggplot2)
@@ -357,7 +361,7 @@ data_selected %>%
 ```
 
 **Graphique 1 : Box diagram - notes de vin par région et année **
-```{r question 3}
+```{r question5b, echo= FALSE}
 
 data_selected <- data_selected %>%
   mutate(Région_Année = paste(Region, Year, sep = " - "))
@@ -386,7 +390,7 @@ Cela signifie que l’écart de notes entre la majorité des vins dans une même
 
 **Graphique 2 : Histogramme - l’écart-type des notes par région et année**
 
-```{r question 3}
+```{r question5c, echo= FALSE}
 data_selected <- data_selected %>%
   mutate(Région_Année = paste(Region, Year, sep = " - "))
 
@@ -427,7 +431,7 @@ Nous remarquons également que, dans certaines régions comme Pfalz (2017 et 201
 
 **Graphique 1-3 : Histogramme - Note moyenne VS la température annuelle moyenne, la précipitation annuelle, la durée d’ensoleillement annuelle**
 
-```{r question 3}
+```{r question5d, echo= FALSE}
 
 library(dplyr)
 library(ggplot2)
@@ -537,13 +541,13 @@ La précipitation annuelle présente une tendance légèrement croissante, ce qu
 
 Cependant, que ce soit pour la température, l’ensoleillement ou les précipitations, les différences de note moyenne entre les catégories restent très faibles, inférieures à 0,25 point. Cela laisse penser que d’autres facteurs non climatiques influencent probablement les notes des vins.
 
-### 9. Les notes attribuées au vin sont-elles cohérentes vis à vis des conditions météorologiques ou il y a t’il d’autres facteurs qui entrent en compte ? ( prix, popularité de la région de production, pays de provenance, réputé du vin…)
+### 7. Les notes attribuées au vin sont-elles cohérentes vis à vis des conditions météorologiques ou il y a t’il d’autres facteurs qui entrent en compte ? ( prix, popularité de la région de production, pays de provenance, réputé du vin…)
 
 Les notes des vins pourraient être influencées de manière biaisée par le prix ou la provenance géographique, indépendamment de la qualité réelle du vin. On s’attend à ce que les vins plus chers et issus de pays réputés soient en moyenne mieux notés.
 
 Voici des scatter plots montrant la relation entre le prix et la note pour les vins rouges, blancs, rosés et pétilants. 
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo= FALSE, warning=FALSE, message=FALSE}
 library(ggplot2)
 library(patchwork)
 library(dplyr)
@@ -593,7 +597,7 @@ On constate que le prix influence légèrement la note pour le vin rouge, mais c
 
 L'analyse n'est donc pas complète, il faudra se penchez ensuite sur le lien entre la note et la provenance du vin.
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo= FALSE, warning=FALSE, message=FALSE}
 
 library(ggplot2)
 library(dplyr)
@@ -704,13 +708,13 @@ ggplot(sparkling_subset, aes(x = reorder(Country_FR, Rating, median), y = Rating
 ```
 Nous pouvons voir que la provenance du vin a une certaine influence sur les notes. En effet, les vins en provenance de France et d'Italie sont très souvent parmis les mikeux notés. Cependant des pays comme l'Autriche ou encore le Géorgie produisent de bons vins blancs, rouges et rosé. ces pays ne nous viennent pas en tête lorsqu'on pense aux bons producteurs de vin, ce qui laisse penser que d'autres critères rentrent en jeu. 
 
-### 7. Y a-t-il des régions productrices davantage impactées par le changement climatique ? Si oui, cela apparaît-il dans la notation du vin ?
+### 8. Y a-t-il des régions productrices davantage impactées par le changement climatique ? Si oui, cela apparaît-il dans la notation du vin ?
 
 On peut imaginer que certaines régions sont plus impactées que d'autres par le dérèglement climatique, et que des régions productrices en font partie. Nous souhaitons vérifier ceci en étudiant les différences de conditions météorologiques au fil des années et selon les régions. Puis, si certaines se démarquent, nous souhaitons étudier l'évolution des notations du vin en fonction des années pour vérifier s'il y a une corrélation. On peut imaginer que certaines régions qui sont davantage impactée par notamment la hausse des températures ou l'augmentation des précipitations auront des notations de vin en baisse au fil des années.
 
 Voici un scatterplot illustrant la relation entre les notes attribuées au vin et leurs pays d'origine. Il est compliqué d'envisager l'entierté de la question et ses enjeux à travers un seul graphique, étant donné qu'elle comprend plus de deux variables
 
-```{r question 7}
+```{r question 8, echo= FALSE}
 
 # Fusionner tous les datasets
 wines_fusionne <- bind_rows(red, white, rose, sparkling)
@@ -761,7 +765,7 @@ ggplot(wines_top_pays, aes(x = Year, y = Rating, color = Country)) +
 
 On constate donc une baisse de la note des vins en général, particulièrement frappant pour le cas de l'Italie et de l'Australie, mais cette visualisation ne permet pas d'être précise car elle ne trace les lignes de tendance que de 3 pays. De plus, il faudrait croiser cette analyse avec une visualition de l'impact du changement climatique sur les différentes régions/ pays. 
 
-### 8. Y a-t-il une corrélation entre les conditions météorologiques et les préférences des consommateurs pour certains types de vin ?
+### 9. Y a-t-il une corrélation entre les conditions météorologiques et les préférences des consommateurs pour certains types de vin ?
 - On peut imaginer que les raisins des vins préférés par les consommateurs ont poussé dans des conditions météorologiques similaires. Pour aller plus loin, nous pouvons étudier si c'est le cas pour tous les types de vin.
 
 Pour répondre à cette question, nous allons analyser les corrélations entre les conditions météorologiques et les notes attribuées aux différents types de vin. Nous allons étudier les corrélations par rapport aux températures moyennes, aux précipitations et à l'ensoleillement.
@@ -769,7 +773,7 @@ Pour répondre à cette question, nous allons analyser les corrélations entre l
 
 *Graphique : Scatter plot, en étudiant les conditions météorologiques en fonction des notations pour chaque type de vin. Nous pouvons étudier les corrélations par rapport aux températures moyennes, selon les précipitations, et selon l'ensoleillement.*
 
-{r question 8}
+```{r question 9, echo= FALSE}
 
 library(ggplot2)
 library(dplyr)
@@ -823,7 +827,7 @@ p3 <- ggplot(wines_summary, aes(x = Avg_Sunshine, y = Avg_Rating, color = Type))
 print(p1)
 print(p2)
 print(p3)
-
+```
 Les scatter plots montrent que les températures modérées sont généralement associées à des notes plus élevées, particulièrement pour les vins rouges et blancs, suggérant que ces types de vin bénéficient de conditions climatiques équilibrées. Concernant les précipitations, un niveau modéré semble favoriser des notes plus élevées, tandis qu'un excès ou un manque de précipitations peut nuire à la qualité du vin. Enfin, un ensoleillement modéré à élevé est généralement associé à des notes plus élevées, bien qu'un ensoleillement excessif puisse parfois avoir un impact négatif.
 
 Ces observations indiquent que les conditions météorologiques jouent un rôle significatif dans la qualité perçue des vins.
@@ -834,7 +838,7 @@ Ces observations indiquent que les conditions météorologiques jouent un rôle 
 
 On s’attend à ce que certaines années se démarquent avec des conditions climatiques idéales (températures moyennes modérées, peu de précipitations pendant la floraison et la récolte, bon ensoleillement), et qu’elles soient associées à des notes plus élevées. On pourrait observer un pic global de notes dans ces “bonnes années”. Il faudra agréger les données météo sur l’année, les normaliser, puis les relier aux moyennes de notes par millésime.
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
 # Analyse des "bonnes années" viticoles : Conditions météorologiques vs Notes des vins
 
@@ -1047,14 +1051,14 @@ print(p1)
 
 Ce graphique juxtapose, pour chaque année entre 2004 et 2018, la note moyenne des vins (axe de gauche, en rouge foncé) et l’indice climatique « idéal » (axe de droite, en bleu) en fonction du temps. On observe que, sur cette période, l’indice climatique optimal progresse globalement vers le bas : après un pic de 105 % autour de 2006, il se situe plutôt près de 95 % à partir de 2015, signe d’années légèrement moins « parfaites » du point de vue météo. En parallèle, la note moyenne des vins suit une tendance similaire : elle descend d’un peu plus de 4,10 en 2006 à environ 3,72 en 2017, avant de se redresser légèrement en 2018. La taille croissante des cercles illustre le nombre de vins notés, ce qui montre que les millésimes les plus récents ont aussi vu un volume d’évaluations plus conséquent. Au final, cette double courbe suggère que lorsque les conditions climatiques s’éloignent de l’optimum (baisse de l’indice), la qualité moyenne mesurée des vins décline sensiblement, confirmant qu’un « bon millésime » au niveau météo tend à générer des notes supérieures.
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Graphiques complémentaires
 print(p2)
 ```
 
 On observe une tendance claire : plus l’indice climatique optimal est élevé, plus la note moyenne des vins augmente (pente positive, r = 0,342). Toutefois, cette relation reste loin d’être parfaite, car des millésimes ayant un indice identique peuvent afficher des notes très disparates, ce qui traduit une dispersion marquée. Cela s’explique par la présence de nombreux facteurs complémentaires (terroir, cépage, pratiques viticoles, etc.) qui contribuent significativement à la qualité finale et limitent la force de la seule corrélation météorologique. Par ailleurs, on note une évolution temporelle intéressante : les années 2004–2007 (en bleu) se situent le plus souvent dans la zone « fort indice → bonne note », alors que les millésimes plus récents (en rouge) se concentrent autour d’un indice moyen (55–65 %) et présentent des notes légèrement inférieures. Au final, ce graphique confirme que la météo exerce un impact réel mais **modéré et pas complètement prédictif** : un bon millésime climatique augmente les chances d’obtenir une note élevée, sans pour autant garantir à lui seul le succès du vin.
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 print(p3)
 ```
 
@@ -1069,7 +1073,7 @@ Hypothèse hydrique : Un équilibre des précipitations (ni trop sec, ni trop hu
 Hypothèse solaire : Un ensoleillement suffisant est nécessaire pour la photosynthèse et la concentration des sucres
 Hypothèse saisonnière : L'impact des conditions météo varie selon les périodes clés du cycle viticole
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Analyse Simple : Impact des Conditions Météorologiques sur les Notes des Vins
 # =============================================================================
 
@@ -1191,7 +1195,7 @@ corrplot(correlations, method = "color", type = "upper",
 
 Cette matrice de corrélation met en lumière l’intensité des corrélations entre toutes les variables météorologiques et les notes de qualité : les couleurs chaudes (rouge/orange) indiquent des liens positifs forts, les nuances froides (bleu) signalent des corrélations négatives. Cette représentation permet d’identifier rapidement les variables météo les plus influentes, de repérer les redondances – par exemple l’intercorrélation fréquente des températures saisonnières.
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
 # Graphique 2: Relations météo vs notes (scatter plots)
 p1 <- ggplot(wines_simple, aes(x = Temp_Annuelle, y = Rating)) +
@@ -1270,20 +1274,20 @@ print(p1)
 
 On observe un nuage de points colorés par type de vin avec droite de régression. La pente de la droite indique la direction et l'intensité de la relation. La dispersion des points révèle la variabilité non expliquée et es intervalles de confiance montrent la fiabilité de la tendance. La pente négative révèle une légère tendance selon laquelle les années plus fraîches sont associées à une meilleure qualité. 
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 print(p2)
 ```
 
 On oberve ici une corrélation positive donc un apport hydrique suffisant favorise la maturation.
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 print(p3)
 ```
 
 Nous pouvons voir une corrélation positive : plus d'ensoleillement favorise la photosynthèse et la concentration des sucres. Mais aussi une effet de seuil : un minimum d'heures de soleil est nécessaire pour une qualité optimale L'ensoleillement peut aussi interagir avec la température (années chaudes et ensoleillées). 
 
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 print(p6)
 ```
 
