@@ -302,6 +302,240 @@ count_Moldova <- wine_data %>%
 
 Si l'on se base simplement sur les résultats que nous apportent les données, on pourrait en conclure que la Moldavie est le pays producteur de vin préféré à l'échelle mondiale. Cependant, il y a une limite à cette représentation, et qui est le nombre d'occurence de chacun des pays. Par exemple, nous avons 13 vins moldaves analysés, face à 3636 italiens. L'ordre de grandeur n'étant pas le même, la comparaison est moins pertinente.
 
+### 5.Les vins produits dans des régions avec des conditions météorologiques similaires ont-ils des notes similaires, indépendamment du type de vin ?
+
+- On peut imaginer que les régions disposant des mêmes conditions météorologiques reçoivent les mêmes notes. Le problème que l'on pourrait rencontrer serait celui de l'influence d'autres facteurs comme le prix, ou la réputation de la région.
+
+**Traitement des données**
+```{r question 3}
+library(dplyr)
+library(readr)
+library(ggplot2)
+library(tidyr)
+red <- read_csv("Red_Weather.csv")
+white <- read_csv("White_Weather.csv")
+rose <- read_csv("Rose_Weather.csv")
+sparkling <- read_csv("Sparkling_Weather.csv")
+
+red$type <- "Red"
+white$type <- "White"
+rose$type <- "Rose"
+sparkling$type <- "Sparkling"
+
+
+data <- bind_rows(red, white, rose, sparkling)
+
+data_clean <- data %>%
+  filter(!is.na(Rating), !is.na(Year), !is.na(Region))
+
+year_region_counts <- data_clean %>%
+  group_by(Year, Region) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  arrange(desc(count))
+
+top_combinations <- tribble(
+  ~Year, ~Region,
+  2018, "Pfalz",
+  2018, "Südtirol - Alto Adige",
+  2017, "Stellenbosch",
+  2018, "Mosel",
+  2018, "Terre Siciliane",
+  2016, "Rioja",
+  2016, "Toscana",
+  2018, "Stellenbosch",
+  2017, "Pfalz",
+  2018, "Pays d'Oc"
+)
+
+data_selected <- data_clean %>%
+  semi_join(top_combinations, by = c("Year", "Region"))
+
+data_selected %>%
+  count(Year, Region) %>%
+  arrange(desc(n))
+
+```
+
+**Graphique 1 : Box diagram - notes de vin par région et année **
+```{r question 3}
+
+data_selected <- data_selected %>%
+  mutate(Région_Année = paste(Region, Year, sep = " - "))
+
+data_selected$Région_Année <- factor(data_selected$Région_Année, 
+                                     levels = unique(data_selected$Région_Année))
+
+ggplot(data_selected, aes(x = Région_Année, y = Rating, fill = Région_Année)) +
+  geom_boxplot() +
+  labs(
+    title = "Distribution des notes de vin : Région - Année",
+    x = "Région - Année",
+    y = "Note"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "none" 
+  )
+
+```
+J’ai sélectionné les dix régions ayant le plus grand nombre d’échantillons de données pour la visualisation. Pour une même région donnée dans une même année, on peut considérer que les conditions météorologiques sont similaires.
+D’après ce graphique, on observe que, dans des conditions climatiques identiques, les notes des vins sont généralement similaires.
+La hauteur des boîtes est généralement inférieure à 0,4, et même inférieure à 0,25 pour plusieurs combinaisons.
+Cela signifie que l’écart de notes entre la majorité des vins dans une même région/année se situe approximativement entre 0,25 et 0,4, ce qui représente une différence relativement faible.
+
+**Graphique 2 : Histogramme - l’écart-type des notes par région et année**
+
+```{r question 3}
+data_selected <- data_selected %>%
+  mutate(Région_Année = paste(Region, Year, sep = " - "))
+
+rating_sd <- data_selected %>%
+  group_by(Région_Année) %>%
+  summarise(
+    n = n(),
+    écart_type = sd(Rating, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+rating_sd$Région_Année <- factor(rating_sd$Région_Année, 
+                                 levels = unique(data_selected$Région_Année))
+
+ggplot(rating_sd, aes(x = Région_Année, y = écart_type, fill = Région_Année)) +
+  geom_col() +
+  labs(
+    title = "Écart-type des notes de vin par région et année",
+    x = "Région - Année",
+    y = "Écart-type des notes"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "none"
+  )
+
+```
+La plupart des combinaisons région + année présentent un écart-type des notes compris entre 0,2 et 0,3, ce qui indique une dispersion relativement faible.
+
+Cela montre qu’il n’y a pas de divergence marquée ni de polarisation extrême dans les évaluations des vins au sein d’une même région.Cela soutient l’hypothèse selon laquelle, dans des conditions climatiques similaires, les notes des vins sont généralement proches.
+
+Nous remarquons également que, dans certaines régions comme Pfalz (2017 et 2018) ou Stellenbosch (2017 et 2018), l’écart-type reste stable d’une année à l’autre.D’un point de vue statistique, cela indique que l’échantillon de données choisi ne présente pas de fluctuations excessives et constitue donc un sous-ensemble fiable et représentatif.
+
+### 6. Le climat est-il le facteur principal de l'appréciation du vin ? 
+
+- On peut imaginer que les régions les plus propices à la croissance adéquate des grains de raisins font les vins les plus appréciés. Le problème pourrait être que la renommée du vin ou son prix entrent en compte inconsciemment dans la note du vin (de manière favorable ou défavorable).
+
+**Graphique 1-3 : Histogramme - Note moyenne VS la température annuelle moyenne, la précipitation annuelle, la durée d’ensoleillement annuelle**
+
+```{r question 3}
+
+library(dplyr)
+library(ggplot2)
+
+data_climat <- data %>%
+  rowwise() %>%
+  mutate(
+    Total_prcp = sum(c_across(where(is.numeric) & ends_with("_prcp")), na.rm = TRUE),
+    Total_tsun = sum(c_across(where(is.numeric) & ends_with("_tsun")), na.rm = TRUE),
+    Total_tavg = mean(c_across(where(is.numeric) & ends_with("_tavg")), na.rm = TRUE)
+  ) %>%
+  ungroup()
+
+data_climat <- data_climat %>%
+  mutate(
+    Catégorie_prcp = case_when(
+      Total_prcp < 15 ~ "< 15 mm",
+      Total_prcp < 20 ~ "15–20 mm",
+      Total_prcp < 25 ~ "20–25 mm",
+      Total_prcp < 30 ~ "25–30 mm",
+      TRUE ~ "> 30 mm"
+    ),
+    Catégorie_tsun = case_when(
+      Total_tsun < 360000 ~ "< 360000 sec",
+      Total_tsun < 380000 ~ "360000–380000 sec",
+      Total_tsun < 400000 ~ "380000–400000 sec",
+      Total_tsun < 420000 ~ "400000–420000 sec",
+      TRUE ~ "> 420000 sec"
+    ),
+    Catégorie_tavg = case_when(
+      Total_tavg < 12 ~ "< 12°C",
+      Total_tavg < 13.5 ~ "12–13.5°C",
+      Total_tavg < 15 ~ "13.5–15°C",
+      Total_tavg < 16.5 ~ "15–16.5°C",
+      TRUE ~ "> 16.5°C"
+    )
+  )
+
+data_climat$Catégorie_prcp <- factor(
+  data_climat$Catégorie_prcp,
+  levels = c("< 15 mm", "15–20 mm", "20–25 mm", "25–30 mm", "> 30 mm")
+)
+
+data_climat$Catégorie_tsun <- factor(
+  data_climat$Catégorie_tsun,
+  levels = c("< 360000 sec", "360000–380000 sec", "380000–400000 sec", "400000–420000 sec", "> 420000 sec")
+)
+
+data_climat$Catégorie_tavg <- factor(
+  data_climat$Catégorie_tavg,
+  levels = c("< 12°C", "12–13.5°C", "13.5–15°C", "15–16.5°C", "> 16.5°C")
+)
+
+rating_tavg <- data_climat %>%
+  filter(!is.na(Catégorie_tavg), !is.na(Rating)) %>%
+  group_by(Catégorie_tavg) %>%
+  summarise(Moyenne_note = mean(Rating), .groups = "drop")
+
+rating_prcp <- data_climat %>%
+  filter(!is.na(Catégorie_prcp), !is.na(Rating)) %>%
+  group_by(Catégorie_prcp) %>%
+  summarise(Moyenne_note = mean(Rating), .groups = "drop")
+
+rating_tsun <- data_climat %>%
+  filter(!is.na(Catégorie_tsun), !is.na(Rating)) %>%
+  group_by(Catégorie_tsun) %>%
+  summarise(Moyenne_note = mean(Rating), .groups = "drop")
+
+ggplot(rating_tavg, aes(x = Catégorie_tavg, y = Moyenne_note, fill = Catégorie_tavg)) +
+  geom_col(width = 0.5) +
+  labs(
+    title = "Note moyenne des vins selon la température annuelle moyenne (affinée)",
+    x = "Catégorie de température",
+    y = "Note moyenne"
+  ) +
+  coord_cartesian(ylim = c(3.0, 4.0)) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+ggplot(rating_prcp, aes(x = Catégorie_prcp, y = Moyenne_note, fill = Catégorie_prcp)) +
+  geom_col(width = 0.5) +
+  labs(
+    title = "Note moyenne des vins selon la précipitation annuelle",
+    x = "Catégorie de précipitation",
+    y = "Note moyenne"
+  ) +
+  coord_cartesian(ylim = c(3.0, 4.0)) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+ggplot(rating_tsun, aes(x = Catégorie_tsun, y = Moyenne_note, fill = Catégorie_tsun)) +
+  geom_col(width = 0.5) +
+  labs(
+    title = "Note moyenne des vins selon la durée d'ensoleillement annuelle",
+    x = "Catégorie d’ensoleillement",
+    y = "Note moyenne"
+  ) +
+  coord_cartesian(ylim = c(3.0, 4.0)) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+Les trois graphiques montrent que les conditions climatiques pourraient avoir une influence sur les notes attribuées aux vins :
+
+La température et la durée d’ensoleillement suivent une courbe en cloche, c’est-à-dire que la meilleure moyenne des notes apparaît dans une zone climatique intermédiaire. Cela suggère l’existence d’une zone climatique optimale pour la qualité du vin.
+La précipitation annuelle présente une tendance légèrement croissante, ce qui pourrait indiquer qu’un niveau de précipitation modéré, voire élevé, favorise la qualité du raisin.
+
+Cependant, que ce soit pour la température, l’ensoleillement ou les précipitations, les différences de note moyenne entre les catégories restent très faibles, inférieures à 0,25 point. Cela laisse penser que d’autres facteurs non climatiques influencent probablement les notes des vins.
 
 ### 9. Les notes attribuées au vin sont-elles cohérentes vis à vis des conditions météorologiques ou il y a t’il d’autres facteurs qui entrent en compte ? ( prix, popularité de la région de production, pays de provenance, réputé du vin…)
 
