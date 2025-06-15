@@ -120,7 +120,6 @@ On peut imaginer que la température de certains mois, comme la période de matu
 Pour analyser l’impact des variations de température sur la qualité du vin, nous nous concentrons sur trois mois clés du cycle de maturation du raisin : avril, juin et septembre. Ces mois correspondent respectivement au début de la floraison, à la phase active de croissance et au moment crucial de la vendange. La température durant ces périodes influence fortement le développement des raisins, la concentration des sucres et des arômes, et donc la qualité finale du vin. Ce choix ciblé permet de mieux saisir les effets climatiques essentiels sur la note attribuée aux vins, tout en évitant la dispersion des données sur des périodes moins déterminantes.
 
 ```{r question 1, echo= FALSE, warning=FALSE, message=FALSE, results='hide'}
-
 # Colonnes des températures moyennes mensuelles
 months <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
@@ -139,12 +138,10 @@ wines_fusionne <- wines_fusionne %>%
     Winter_tavg = (Dec_tavg + Jan_tavg + Feb_tavg) / 3
   )
 
-
-#1: Scatterplot note vs température moyenne de quelques mois clés par type de vin
+# 1: Scatterplot note vs température moyenne de quelques mois clés par type de vin
 
 # Choix de mois clés, par exemple Avril, Juin, Septembre (période maturation, croissance)
 months_key <- c("Apr_tavg", "Jun_tavg", "Sep_tavg")
-
 
 # Pivot long pour scatterplot
 scatter_data <- wines_fusionne %>%
@@ -153,14 +150,26 @@ scatter_data <- wines_fusionne %>%
                names_to = "Month",
                values_to = "Temperature")
 
+# Scatterplot avec couleurs personnalisées
 ggplot(scatter_data, aes(x = Temperature, y = Rating, color = Type)) +
   geom_point(alpha = 0.4, size = 1) +
-  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 2) +
   facet_wrap(~Month, scales = "free_x") +
-  labs(title = "Note du vin vs Température moyenne (mois clés) par type de vin",
-       x = "Température moyenne (°C)",
-       y = "Note") +
+  scale_color_manual(
+    values = c(
+      "Red" = "red",
+      "White" = "gold",
+      "Rosé" = "pink",
+      "Sparkling" = "skyblue"
+    )
+  ) +
+  labs(
+    title = "Note du vin vs Température moyenne (mois clés) par type de vin",
+    x = "Température moyenne (°C)",
+    y = "Note"
+  ) +
   theme_minimal()
+
 ```
 
 On observe que les vins rouges présentent une grande stabilité dans leur note, quelle que soit la température. Cela confirme leur résilience face aux variations climatiques, même lorsque les températures deviennent élevées. Les vins blancs suivent une tendance similaire, bien que légèrement plus sensible, notamment en avril.
@@ -207,8 +216,16 @@ wines_long <- wines_selected %>%
 
 ggplot(wines_long, aes(x = Precipitation, y = Rating, color = Type)) +
   geom_point(alpha = 0.4, size = 1) +
-  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 2) +
   facet_wrap(~ Month, scales = "free_x") +
+  scale_color_manual(
+    values = c(
+      "Red" = "red",
+      "White" = "gold",
+      "Rosé" = "pink",
+      "Sparkling" = "skyblue"
+    )
+  ) +
   labs(title = "Note des vins vs Précipitations des mois clés",
        x = "Précipitations (mm)",
        y = "Note du vin",
