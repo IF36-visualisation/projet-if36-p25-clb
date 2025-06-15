@@ -1,15 +1,16 @@
 ---
-title: "Rapport - Analyse de la qualité de différents vins et des conditions météorologiques des régions de production"
+title: "Rapport - Analyse de la qualité de différents vins et des conditions météorologiques
+  des régions de production"
 output:
   prettydoc::html_pretty:
     theme: hpstr
+date: "2024-05-05"
 knitr:
   opts_chunk:
     echo: false
     warning: false,
     message: false,
-    results: "hide"
-date: "2024-05-05"
+    results: hide
 ---
 
 ```{r setup, include=FALSE}
@@ -117,7 +118,7 @@ On peut imaginer que la température de certains mois, comme la période de matu
 
 Pour analyser l’impact des variations de température sur la qualité du vin, nous nous concentrons sur trois mois clés du cycle de maturation du raisin : avril, juin et septembre. Ces mois correspondent respectivement au début de la floraison, à la phase active de croissance et au moment crucial de la vendange. La température durant ces périodes influence fortement le développement des raisins, la concentration des sucres et des arômes, et donc la qualité finale du vin. Ce choix ciblé permet de mieux saisir les effets climatiques essentiels sur la note attribuée aux vins, tout en évitant la dispersion des données sur des périodes moins déterminantes.
 
-```{r question 1, echo=FALSE}
+```{r question 1, echo= FALSE, warning=FALSE, message=FALSE, results='hide'}
 
 # Colonnes des températures moyennes mensuelles
 months <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -153,7 +154,7 @@ scatter_data <- wines_fusionne %>%
 
 ggplot(scatter_data, aes(x = Temperature, y = Rating, color = Type)) +
   geom_point(alpha = 0.4, size = 1) +
-  geom_smooth(method = "loess", se = FALSE) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
   facet_wrap(~Month, scales = "free_x") +
   labs(title = "Note du vin vs Température moyenne (mois clés) par type de vin",
        x = "Température moyenne (°C)",
@@ -175,7 +176,7 @@ Dans l’étude de l’impact des précipitations sur la qualité du vin, il est
 Nous avons donc choisi d’analyser principalement les précipitations des mois de mai à septembre, qui correspondent généralement à cette phase critique de maturation dans les principales régions viticoles étudiées. Pendant cette période, une quantité modérée d’eau peut favoriser une bonne croissance et un bon équilibre de la vigne, tandis qu’un excès d’eau risque d’entraîner des maladies, une dilution des arômes ou une dégradation de la qualité.
 Cette sélection permet de mieux cerner l’effet des précipitations pendant les périodes les plus sensibles, tout en réduisant le bruit lié aux précipitations hors saison de croissance active.
 
-```{r question2, echo=FALSE}
+```{r question2, echo= FALSE, warning=FALSE, message=FALSE, results='hide'}
 # Ajouter une colonne Type pour distinguer les types de vin
 red_qu2 <- red %>% mutate(Type = "Red")
 white_qu2 <- white %>% mutate(Type = "White")
@@ -205,7 +206,7 @@ wines_long <- wines_selected %>%
 
 ggplot(wines_long, aes(x = Precipitation, y = Rating, color = Type)) +
   geom_point(alpha = 0.4, size = 1) +
-  geom_smooth(method = "loess", se = FALSE) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
   facet_wrap(~ Month, scales = "free_x") +
   labs(title = "Note des vins vs Précipitations des mois clés",
        x = "Précipitations (mm)",
@@ -230,7 +231,7 @@ Au global, ce graphique suggère que les vins pétillants sont les plus sensible
 
 **Graphique 1 : Scatterplot - four Seasons Sunshine VS Rating - LOESS**
 
-```{r all wine graphique}
+```{r all wine graphique, echo= FALSE, warning=FALSE, message=FALSE, results='hide'}
 library(dplyr)
 library(readr)
 library(ggplot2)
@@ -278,7 +279,7 @@ long_seasonal_weather <- selected_Weather_Annual_Sunshine %>%
 
 ggplot(long_seasonal_weather, aes(x = Sunshine, y = Rating, color = Wine_Type)) +
   geom_point(alpha = 0.6, size = 1.2) +
-  geom_smooth(method = "loess", se = FALSE, size = 0.7, span = 1, color = "steelblue") +
+  geom_smooth(method = "loess", se = FALSE, linewidth = 1, size = 0.7, span = 1, color = "steelblue") +
   facet_grid(rows = vars(Wine_Type), cols = vars(Season)) +
   labs(title = "Wine Rating vs Seasonal Sunshine (All Types)",
        x = "Seasonal Sunshine Duration (hours)",
@@ -388,6 +389,7 @@ ggplot(data_selected, aes(x = Région_Année, y = Rating, fill = Région_Année)
   )
 
 ```
+
 J’ai sélectionné les dix régions ayant le plus grand nombre d’échantillons de données pour la visualisation. Pour une même région donnée dans une même année, on peut considérer que les conditions météorologiques sont similaires.
 D’après ce graphique, on observe que, dans des conditions climatiques identiques, les notes des vins sont généralement similaires.
 La hauteur des boîtes est généralement inférieure à 0,4, et même inférieure à 0,25 pour plusieurs combinaisons.
@@ -1013,34 +1015,6 @@ Cette matrice de corrélation met en lumière l’intensité des corrélations e
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
-# Graphique 2: Relations météo vs notes (scatter plots)
-p1 <- ggplot(wines_simple, aes(x = Temp_Annuelle, y = Rating)) +
-  geom_point(aes(color = Type), alpha = 0.6) +
-  geom_smooth(method = "lm", se = TRUE, color = "red") +
-  labs(title = "Température Annuelle vs Note du Vin",
-       x = "Température Moyenne Annuelle (°C)",
-       y = "Note du Vin",
-       color = "Type") +
-  theme_minimal()
-
-p2 <- ggplot(wines_simple, aes(x = Pluie_Annuelle, y = Rating)) +
-  geom_point(aes(color = Type), alpha = 0.6) +
-  geom_smooth(method = "lm", se = TRUE, color = "red") +
-  labs(title = "Précipitations Annuelles vs Note du Vin",
-       x = "Précipitations Totales (mm)",
-       y = "Note du Vin",
-       color = "Type") +
-  theme_minimal()
-
-p3 <- ggplot(wines_simple, aes(x = Soleil_Annuel, y = Rating)) +
-  geom_point(aes(color = Type), alpha = 0.6) +
-  geom_smooth(method = "lm", se = TRUE, color = "red") +
-  labs(title = "Ensoleillement Annuel vs Note du Vin",
-       x = "Ensoleillement Total (heures)",
-       y = "Note du Vin",
-       color = "Type") +
-  theme_minimal()
-
 # 6. ANALYSE PAR SAISONS
 # ======================
 
@@ -1082,23 +1056,15 @@ p6 <- ggplot(saison_long, aes(x = Saison, y = Correlation, fill = Variable)) +
 # 8. AFFICHAGE DES GRAPHIQUES
 # ============================
 
-print("Affichage des visualisations...")
-
-# Graphiques principaux 
-print(p1)
 ```
 
 On observe un nuage de points colorés par type de vin avec droite de régression. La pente de la droite indique la direction et l'intensité de la relation. La dispersion des points révèle la variabilité non expliquée et es intervalles de confiance montrent la fiabilité de la tendance. La pente négative révèle une légère tendance selon laquelle les années plus fraîches sont associées à une meilleure qualité. 
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-print(p2)
-```
+
 
 On oberve ici une corrélation positive donc un apport hydrique suffisant favorise la maturation.
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-print(p3)
-```
+
 
 Nous pouvons voir une corrélation positive : plus d'ensoleillement favorise la photosynthèse et la concentration des sucres. Mais aussi une effet de seuil : un minimum d'heures de soleil est nécessaire pour une qualité optimale L'ensoleillement peut aussi interagir avec la température (années chaudes et ensoleillées). 
 
