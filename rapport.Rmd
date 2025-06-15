@@ -222,65 +222,84 @@ Au global, ce graphique suggère que les vins pétillants sont les plus sensible
 
 -On peut imaginer que des raisins bénéficiant d’un ensoleillement important pendant certains mois clés (comme la période de maturation) produisent des vins mieux notés. Cependant, un ensoleillement excessif, accompagné de chaleur intense, pourrait entraîner une baisse de la qualité.
 
-**Traitement des données**
-```{r question3a, echo= FALSE}
-Red_Weather <- read_csv("Red_Weather.csv")
-# Sélection des données nécessaires, simplification des tableaux
-selected_Red_Weather <- Red_Weather %>%
+**Graphique 1 : Scatterplot - four Seasons Sunshine VS Rating - LOESS**
+
+```{r all wine graphique}
+library(dplyr)
+library(readr)
+library(ggplot2)
+library(tidyr)
+red <- read_csv("Red_Weather.csv")
+white <- read_csv("White_Weather.csv")
+rose <- read_csv("Rose_Weather.csv")
+sparkling <- read_csv("Sparkling_Weather.csv")
+
+red$Wine_Type <- "Red"
+white$Wine_Type <- "White"
+rose$Wine_Type <- "Rosé"
+sparkling$Wine_Type <- "Sparkling"
+
+all_wine_weather <- bind_rows(red, white, rose, sparkling)
+
+all_wine_weather <- all_wine_weather %>%
   select(Name, Country, Region, Winery, Rating, NumberOfRatings, Price, Year,
-         city, country, lat, lng,
+         city, country, lat, lng, Wine_Type,
          Jan_tsun, Feb_tsun, Mar_tsun, Apr_tsun, May_tsun, Jun_tsun,
          Jul_tsun, Aug_tsun, Sep_tsun, Oct_tsun, Nov_tsun, Dec_tsun)
 
-# Ajouter des colonnes pour Annual_Sunshine, Sunshine of Four season
-selected_Red_Weather_Annual_Sunshine <- selected_Red_Weather %>%
+selected_Weather_Annual_Sunshine <- all_wine_weather %>%
   mutate(Annual_Sunshine = (Jan_tsun + Feb_tsun + Mar_tsun + Apr_tsun + May_tsun + Jun_tsun +
            Jul_tsun + Aug_tsun + Sep_tsun + Oct_tsun + Nov_tsun + Dec_tsun)/3600)
 
-selected_Red_Weather_Annual_Sunshine <- selected_Red_Weather_Annual_Sunshine %>%
+selected_Weather_Annual_Sunshine <- selected_Weather_Annual_Sunshine %>%
   mutate(Spring_Sunshine = (Mar_tsun + Apr_tsun + May_tsun)/3600)
 
-selected_Red_Weather_Annual_Sunshine <- selected_Red_Weather_Annual_Sunshine %>%
+selected_Weather_Annual_Sunshine <- selected_Weather_Annual_Sunshine %>%
   mutate(Summer_Sunshine = (Jun_tsun +Jul_tsun + Aug_tsun)/3600)
 
-selected_Red_Weather_Annual_Sunshine <- selected_Red_Weather_Annual_Sunshine %>%
+selected_Weather_Annual_Sunshine <- selected_Weather_Annual_Sunshine %>%
   mutate(Autumn_Sunshine = (Sep_tsun + Oct_tsun + Nov_tsun)/3600)
 
-selected_Red_Weather_Annual_Sunshine <- selected_Red_Weather_Annual_Sunshine %>%
+selected_Weather_Annual_Sunshine <- selected_Weather_Annual_Sunshine %>%
   mutate(Winter_Sunshine = (Jan_tsun + Feb_tsun + Dec_tsun)/3600)
-```
 
-**Graphique 1 : Scatterplot - Top countries - four Seasons Sunshine VS Rating - LOESS**
-```{r question3B, echo= FALSE}
-top_countries <- c("France", "Italy", "Spain", "United States")
-Red_Weather_top_countries <- selected_Red_Weather_Annual_Sunshine %>%
-  filter(Country %in% top_countries)
-
-long_seasonal_Red_Weather <- Red_Weather_top_countries %>%
-  select(Country, Rating, Spring_Sunshine, Summer_Sunshine, Autumn_Sunshine, Winter_Sunshine) %>%
+long_seasonal_weather <- selected_Weather_Annual_Sunshine %>%
+  select(Rating, Wine_Type,
+         Spring_Sunshine, Summer_Sunshine, Autumn_Sunshine, Winter_Sunshine) %>%
   pivot_longer(cols = starts_with(c("Spring", "Summer", "Autumn", "Winter")),
                names_to = "Season",
                values_to = "Sunshine")
 
-ggplot(long_seasonal_Red_Weather, aes(x = Sunshine, y = Rating)) +
-  geom_point(alpha = 0.5, size = 0.8, color = "steelblue") +
-  geom_smooth(method = "loess", se = FALSE, color = "darkred", size = 0.7, span = 1) +
-  facet_grid(rows = vars(Country), cols = vars(Season)) +
-  labs(title = "Wine Rating vs Seasonal Sunshine Duration (by Country and Season)",
+ggplot(long_seasonal_weather, aes(x = Sunshine, y = Rating, color = Wine_Type)) +
+  geom_point(alpha = 0.6, size = 1.2) +
+  geom_smooth(method = "loess", se = FALSE, size = 0.7, span = 1, color = "steelblue") +
+  facet_grid(rows = vars(Wine_Type), cols = vars(Season)) +
+  labs(title = "Wine Rating vs Seasonal Sunshine (All Types)",
        x = "Seasonal Sunshine Duration (hours)",
-       y = "Wine Rating") +
+       y = "Wine Rating",
+       color = "Wine Type") +
+  scale_color_manual(values = c(
+    "Red" = "red",
+    "White" = "gold",
+    "Rosé" = "pink",
+    "Sparkling" = "skyblue"
+  )) +
   theme_minimal() +
   theme(strip.text = element_text(size = 10, face = "bold"))
+
 ```
 
-Nous pouvons constater que les courbes de régression de la cote de lumière sont différentes pour chaque saison. La France et les États-Unis suivent le principe du 'U inversé' pendant la plupart des saisons. Ceci suggère qu'une exposition modérée à la lumière est favorable à la qualité du vin, alors qu'une exposition excessive à la lumière peut avoir un impact négatif sur la qualité du raisin. En Italie, en général, les notes de vin diminuent avec l'augmentation de la lumière au cours des quatre saisons. L'Espagne, en revanche, a suivi la même tendance que l'Italie en hiver et au printemps, mais a présenté un U inversé en été et en automne.
+Ce graphique montre la variation des notes des différents types de vin (rouge, blanc, rosé, pétillant) en fonction de la durée d’ensoleillement saisonnière sur les quatre saisons.
 
-La sensibilité de la qualité du vin à l'ensoleillement ne dépend pas uniquement de la quantité absolue de lumière solaire, mais aussi du climat de référence propre à chaque région. 
+Les vins rouges présentent une tendance clairement en cloche (forme de U inversé) au printemps, en été et en automne : une exposition modérée au soleil est associée à de meilleures notes, tandis qu’un ensoleillement trop faible ou trop fort entraîne une baisse de la qualité. Cette tendance est relativement constante sur ces trois saisons. En hiver, les variations de note deviennent plus faibles et l’effet de l’ensoleillement semble négligeable.
 
-Par exemple, en Italie, nous observons que plus l'ensoleillement est élevé, plus la note du vin tend à diminuer. Cela peut s'expliquer par le fait que l'Italie, caractérisée par un climat méditerranéen, bénéficie déjà d'un fort ensoleillement, et qu'une exposition excessive accélère la surmaturation des raisins, entraînant une baisse de qualité.
-En Espagne, en revanche, nous constatons une corrélation négative en hiver et au printemps, et une relation en forme de U inversé en été et en automne. Selon les différentes étapes du cycle végétatif de la vigne, nous pouvons supposer qu'une chaleur et une sécheresse excessives en hiver et au printemps nuisent à la floraison et à la nouaison, tandis qu'un ensoleillement modéré en été et en automne favorise la maturation, à condition d'éviter les températures extrêmes.
+Les vins rosés restent globalement stables tout au long de l’année, avec peu de variation des notes, ce qui suggère une faible sensibilité à la lumière.
 
-Ainsi, pour les recherches futures, au lieu d'étudier séparément l'effet de l'ensoleillement, des précipitations et de la température sur la qualité du vin, il serait pertinent d'analyser ces facteurs de manière combinée.
+Les vins pétillants montrent une tendance à la hausse de la note avec l’augmentation de l’ensoleillement dans toutes les saisons, avec un certain seuil optimal. Globalement, la durée d’ensoleillement semble influencer leur qualité dans une certaine mesure.
+
+Les vins blancs présentent une légère tendance à la baisse au printemps, en été et en automne, ce qui signifie que plus il y a de soleil, plus la note diminue. Cela pourrait indiquer que les cépages blancs sont moins adaptés à une lumière trop intense pendant leur développement.
+
+En somme, chaque type de vin présente une réaction différente face à l’ensoleillement. On peut conclure que la lumière du soleil a bien un impact sur la qualité du vin, et qu’une exposition modérée semble généralement favorable à une meilleure note.
 
 ### II. Influence du climat à l'échelle régionale
 
@@ -289,6 +308,8 @@ Ainsi, pour les recherches futures, au lieu d'étudier séparément l'effet de l
 - On peut imaginer que les régions disposant des mêmes conditions météorologiques reçoivent les mêmes notes. Le problème que l'on pourrait rencontrer serait celui de l'influence d'autres facteurs comme le prix, ou la réputation de la région.
 
 **Traitement des données**
+Afin d’étudier si différents types de vin présentent une qualité similaire dans des conditions météorologiques comparables, j’ai choisi de réaliser l’analyse au sein d’une même région et d’une même année. Cela permet de garantir au maximum l’homogénéité des conditions climatiques. J’ai identifié les dix régions les plus représentées dans la base de données, puis basé mon analyse sur ces régions. Le choix de régions avec un volume de données important permet d’améliorer la significativité statistique des résultats obtenus.
+
 ```{r question5a, echo= FALSE}
 library(dplyr)
 library(readr)
