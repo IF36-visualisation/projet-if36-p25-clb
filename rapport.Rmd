@@ -109,6 +109,7 @@ rose_weather <- rose_weather %>% mutate(Type = "Rosé")
 sparkling_weather <- sparkling_weather %>% mutate(Type = "Sparkling")
 wines_fusionne <- bind_rows(red_weather, white_weather, rose_weather, sparkling_weather)
 ```
+
 ### I. Influence des conditions climatiques sur la qualité du vin
 
 #### Comment les variations de températures influencent-elles la qualité des vins ?
@@ -227,7 +228,7 @@ Au global, ce graphique suggère que les vins pétillants sont les plus sensible
 
 #### Comment l'ensoleillement influence-t-il la qualité des vins ?
 
--On peut imaginer que des raisins bénéficiant d’un ensoleillement important pendant certains mois clés (comme la période de maturation) produisent des vins mieux notés. Cependant, un ensoleillement excessif, accompagné de chaleur intense, pourrait entraîner une baisse de la qualité.
+On peut imaginer que des raisins bénéficiant d’un ensoleillement important pendant certains mois clés (comme la période de maturation) produisent des vins mieux notés. Cependant, un ensoleillement excessif, accompagné de chaleur intense, pourrait entraîner une baisse de la qualité.
 
 **Graphique 1 : Scatterplot - four Seasons Sunshine VS Rating - LOESS**
 
@@ -293,7 +294,6 @@ ggplot(long_seasonal_weather, aes(x = Sunshine, y = Rating, color = Wine_Type)) 
   )) +
   theme_minimal() +
   theme(strip.text = element_text(size = 10, face = "bold"))
-
 ```
 
 Ce graphique montre la variation des notes des différents types de vin (rouge, blanc, rosé, pétillant) en fonction de la durée d’ensoleillement saisonnière sur les quatre saisons.
@@ -312,7 +312,7 @@ En somme, chaque type de vin présente une réaction différente face à l’ens
 
 #### Les vins produits dans des régions avec des conditions météorologiques similaires ont-ils des notes similaires, indépendamment du type de vin ?
 
-- On peut imaginer que les régions disposant des mêmes conditions météorologiques reçoivent les mêmes notes. Le problème que l'on pourrait rencontrer serait celui de l'influence d'autres facteurs comme le prix, ou la réputation de la région.
+On peut imaginer que les régions disposant des mêmes conditions météorologiques reçoivent les mêmes notes. Le problème que l'on pourrait rencontrer serait celui de l'influence d'autres facteurs comme le prix, ou la réputation de la région.
 
 **Traitement des données**
 Afin d’étudier si différents types de vin présentent une qualité similaire dans des conditions météorologiques comparables, j’ai choisi de réaliser l’analyse au sein d’une même région et d’une même année. Cela permet de garantir au maximum l’homogénéité des conditions climatiques. J’ai identifié les dix régions les plus représentées dans la base de données, puis basé mon analyse sur ces régions. Le choix de régions avec un volume de données important permet d’améliorer la significativité statistique des résultats obtenus.
@@ -363,10 +363,10 @@ data_selected <- data_clean %>%
 data_selected %>%
   count(Year, Region) %>%
   arrange(desc(n))
-
 ```
 
 **Graphique 1 : Box diagram - notes de vin par région et année **
+
 ```{r question5b, echo= FALSE}
 
 data_selected <- data_selected %>%
@@ -387,7 +387,6 @@ ggplot(data_selected, aes(x = Région_Année, y = Rating, fill = Région_Année)
     axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "none" 
   )
-
 ```
 
 J’ai sélectionné les dix régions ayant le plus grand nombre d’échantillons de données pour la visualisation. Pour une même région donnée dans une même année, on peut considérer que les conditions météorologiques sont similaires.
@@ -426,6 +425,7 @@ ggplot(rating_sd, aes(x = Région_Année, y = écart_type, fill = Région_Année
   )
 
 ```
+
 La plupart des combinaisons région + année présentent un écart-type des notes compris entre 0,2 et 0,3, ce qui indique une dispersion relativement faible.
 
 Cela montre qu’il n’y a pas de divergence marquée ni de polarisation extrême dans les évaluations des vins au sein d’une même région.Cela soutient l’hypothèse selon laquelle, dans des conditions climatiques similaires, les notes des vins sont généralement proches.
@@ -528,18 +528,25 @@ country_ratings <- wine_data %>%
 ```
 
 ```{r, echo= FALSE}
-# Top 10 des pays
+# Top 10 des pays (triés par note moyenne)
 top_countries <- country_ratings %>%
-  top_n(10, mean_rating)
+  top_n(10, mean_rating) %>%
+  arrange(mean_rating)
 
-ggplot(top_countries, aes(x = reorder(Country, mean_rating), y = mean_rating)) +
+ggplot(top_countries, aes(x = reorder(Country, mean_rating), y = mean_rating, fill = mean_rating)) +
   geom_col() +
   coord_flip() +
-  labs(title = "Top 10 des pays selon la note moyenne de leurs vins",
-       x = "Pays",
-       y = "Note moyenne",
-       caption = "Sources : Red, Rose, White et Sparkling Weather") +
-  theme_minimal()
+  labs(
+    title = "Top 10 des pays selon la note moyenne de leurs vins",
+    x = "Pays",
+    y = "Note moyenne",
+    caption = "Sources : Red, Rosé, White et Sparkling Weather"
+  ) +
+  theme_minimal() +
+  scale_fill_gradientn(
+    colours = rainbow(10),  
+    guide = "none"        
+  )
 
 # Nombre d'occurrences
 count_Moldova <- wine_data %>%
@@ -567,16 +574,22 @@ top10_data <- wine_data %>%
 top10_ratings <- top10_data %>%
   group_by(Country) %>%
   summarise(mean_rating = mean(Rating, na.rm = TRUE)) %>%
-  arrange(desc(mean_rating))
+  arrange(mean_rating)  # pour un bel ordre visuel
 
-ggplot(top10_ratings, aes(x = reorder(Country, mean_rating), y = mean_rating)) +
-  geom_col(fill = "#5c9ead") +
+top10_ratings$Country <- factor(top10_ratings$Country, levels = top10_ratings$Country)
+
+ggplot(top10_ratings, aes(x = Country, y = mean_rating, fill = Country)) +
+  geom_col() +
   coord_flip() +
-  labs(title = "Note moyenne des 10 plus grands producteurs de vin",
-       x = "Pays",
-       y = "Note moyenne",
-       caption = "Sources : Red, Rosé, White et Sparkling") +
-  theme_minimal()
+  labs(
+    title = "Note moyenne des 10 plus grands producteurs de vin",
+    x = "Pays",
+    y = "Note moyenne",
+    caption = "Sources : Red, Rosé, White et Sparkling"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = rainbow(10)) +
+  theme(legend.position = "none")
 ``` 
 
 En se basant cette fois-ci sur les 10 pays ayant le plus grand nombre d’occurrences dans les données, c’est-à-dire les 10 plus grands producteurs de vin représentés dans notre base, on obtient un classement plus pertinent et représentatif de la réalité à l’échelle mondiale. Dans ce nouveau classement, la France apparaît comme le pays dont les vins sont les mieux notés, suivie  par l’Italie, puis les États-Unis, l’Allemagne, le Portugal, l’Autriche, l’Espagne, l’Afrique du Sud, l’Australie et enfin le Chili. Les notes moyennes sont toutes relativement proches.
@@ -584,7 +597,8 @@ En se basant cette fois-ci sur les 10 pays ayant le plus grand nombre d’occurr
 Ce résultat diffère de notre hypothèse de départ, qui plaçait l’Italie en tête. Bien qu’elle soit le plus grand producteur mondial en volume, l’Italie est ici devancée par la France, ce qui laisse entendre que les vins français sont globalement perçus comme légèrement supérieurs en termes de qualité moyenne. Les États-Unis, bien que leur arrivée sur le marché de la viticulture mondiale soit assez récente, se positionnent également très favorablement, ce qui témoigne de la reconnaissance croissante de leurs productions. On remarque une majorité d'acteurs européens, ce qui n'est pas très étonnant, car ce sont des acteurs implantés depuis longtemps sur le marché du vin.
 
 #### Y a-t-il une corrélation entre les conditions météorologiques et les préférences des consommateurs pour certains types de vin ?
-- On peut imaginer que les raisins des vins préférés par les consommateurs ont poussé dans des conditions météorologiques similaires. Pour aller plus loin, nous pouvons étudier si c'est le cas pour tous les types de vin.
+
+On peut imaginer que les raisins des vins préférés par les consommateurs ont poussé dans des conditions météorologiques similaires. Pour aller plus loin, nous pouvons étudier si c'est le cas pour tous les types de vin.
 
 Pour répondre à cette question, nous allons analyser les corrélations entre les conditions météorologiques et les notes attribuées aux différents types de vin. Nous allons étudier les corrélations par rapport aux températures moyennes, aux précipitations et à l'ensoleillement.
 
@@ -646,6 +660,7 @@ print(p1)
 print(p2)
 print(p3)
 ```
+
 Les scatter plots montrent que les températures modérées sont généralement associées à des notes plus élevées, particulièrement pour les vins rouges et blancs, suggérant que ces types de vin bénéficient de conditions climatiques équilibrées. Concernant les précipitations, un niveau modéré semble favoriser des notes plus élevées, tandis qu'un excès ou un manque de précipitations peut nuire à la qualité du vin. Enfin, un ensoleillement modéré à élevé est généralement associé à des notes plus élevées, bien qu'un ensoleillement excessif puisse parfois avoir un impact négatif.
 
 Ces observations indiquent que les conditions météorologiques jouent un rôle significatif dans la qualité perçue des vins.
