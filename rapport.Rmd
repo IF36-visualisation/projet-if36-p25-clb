@@ -6,11 +6,17 @@ output:
 knitr:
   opts_chunk:
     echo: false
+    warning: false,
+    message: false,
+    results: "hide"
 date: "2024-05-05"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+options(readr.show_col_types = FALSE)
+options(lifecycle_verbosity = "quiet")
+options(dplyr.summarise.inform = FALSE)
 ```
 # Introduction
 
@@ -430,7 +436,7 @@ On peut imaginer que certaines régions sont plus impactées que d'autres par le
 
 Voici un scatterplot illustrant la relation entre les notes attribuées au vin et leurs pays d'origine. Il est compliqué d'envisager l'entierté de la question et ses enjeux à travers un seul graphique, étant donné qu'elle comprend plus de deux variables
 
-```{r question 8, echo= FALSE}
+```{r question 8, echo= FALSE, warning=FALSE, message=FALSE, results='hide'}
 
 # Fusionner tous les datasets
 wines_fusionne <- bind_rows(red, white, rose, sparkling)
@@ -438,30 +444,32 @@ wines_fusionne <- bind_rows(red, white, rose, sparkling)
 # Calcul des moyennes annuelles température + précipitations
 wines_fusionne <- wines_fusionne %>%
   mutate(
-    Temp_Annuel = rowMeans(select(., ends_with("tavg")), na.rm = TRUE),
+    Temp_Annuel   = rowMeans(select(., ends_with("tavg")), na.rm = TRUE),
     Precip_Annuel = rowSums(select(., ends_with("prcp")), na.rm = TRUE)
   )
 
 # Préparer les données : moyenne température par Country et Year
 temp_moyenne <- wines_fusionne %>%
-  group_by(Country,Year) %>%
-  summarise(Temp_Moyenne = mean(Temp_Annuel, na.rm = TRUE)) %>%
-  ungroup()
+  group_by(Country, Year) %>%
+  summarise(
+    Temp_Moyenne = mean(Temp_Annuel, na.rm = TRUE),
+    .groups = "drop"
+  )
 
-# Sélectionner les pays où l'augmentation de température est forte
-
+# Sélectionner les 5 pays où l'augmentation de température est la plus forte
 variation_temp <- temp_moyenne %>%
   group_by(Country) %>%
   summarise(
     Temp_ancienne = mean(Temp_Moyenne[Year <= 2000], na.rm = TRUE),
-    Temp_recent = mean(Temp_Moyenne[Year >= 2010], na.rm = TRUE),
-    Diff = Temp_recent - Temp_ancienne
+    Temp_recent   = mean(Temp_Moyenne[Year >= 2010], na.rm = TRUE),
+    Diff          = Temp_recent - Temp_ancienne,
+    .groups = "drop"
   ) %>%
   arrange(desc(Diff))
 
-# Voir les pays avec la plus forte hausse
-top_pays <- head(variation_temp$Country, 5)  # Garder les 5 pays les plus impactés
-top_pays
+top_pays <- variation_temp %>%
+  slice_head(n = 5) %>%  # ou slice_max(Diff, n=5)
+  pull(Country)
 
 # Filtrer les données pour les pays impactés
 wines_top_pays <- wines_fusionne %>%
@@ -470,11 +478,11 @@ wines_top_pays <- wines_fusionne %>%
 # Graphique : évolution des ratings
 ggplot(wines_top_pays, aes(x = Year, y = Rating, color = Country)) +
   geom_point(alpha = 0.6) +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
   labs(
     title = "Évolution des Notes des Vins dans les Pays les Plus Impactés",
-    x = "Année",
-    y = "Note du Vin"
+    x     = "Année",
+    y     = "Note du Vin"
   ) +
   theme_minimal()
 ```
@@ -581,7 +589,7 @@ Pour répondre à cette question, nous allons analyser les corrélations entre l
 
 *Graphique : Scatter plot, en étudiant les conditions météorologiques en fonction des notations pour chaque type de vin. Nous pouvons étudier les corrélations par rapport aux températures moyennes, selon les précipitations, et selon l'ensoleillement.*
 
-```{r question 9, echo= FALSE}
+```{r question 9, echo=FALSE, warning=FALSE, message=FALSE}
 
 library(ggplot2)
 library(dplyr)
@@ -609,7 +617,7 @@ wines_summary <- wines %>%
 # Créer les scatter plots
 p1 <- ggplot(wines_summary, aes(x = Avg_Temp, y = Avg_Rating, color = Type)) +
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
+ geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
   labs(title = "Température moyenne annuelle vs Note moyenne",
        x = "Température moyenne annuelle (°C)",
        y = "Note moyenne") +
@@ -617,7 +625,7 @@ p1 <- ggplot(wines_summary, aes(x = Avg_Temp, y = Avg_Rating, color = Type)) +
 
 p2 <- ggplot(wines_summary, aes(x = Avg_Precip, y = Avg_Rating, color = Type)) +
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
   labs(title = "Précipitations moyennes annuelles vs Note moyenne",
        x = "Précipitations moyennes annuelles (mm)",
        y = "Note moyenne") +
@@ -625,7 +633,7 @@ p2 <- ggplot(wines_summary, aes(x = Avg_Precip, y = Avg_Rating, color = Type)) +
 
 p3 <- ggplot(wines_summary, aes(x = Avg_Sunshine, y = Avg_Rating, color = Type)) +
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
   labs(title = "Ensoleillement moyen annuel vs Note moyenne",
        x = "Ensoleillement moyen annuel (heures)",
        y = "Note moyenne") +
