@@ -182,6 +182,121 @@ rose_weather <- rose_weather %>% mutate(Type = "Rosé")
 sparkling_weather <- sparkling_weather %>% mutate(Type = "Sparkling")
 wines_fusionne <- bind_rows(red_weather, white_weather, rose_weather, sparkling_weather)
 ```
+### 1. Comment les variations de températures influencent-elles la qualité des vins ?
+
+On peut imaginer que la température de certains mois, comme la période de maturation du raisin, est fortement corrélée à la note du vin. Lorsque la température augmente, la note du vin peut également augmenter. Cependant, au-delà d’un certain seuil critique, une température trop élevée peut entraîner une baisse de la qualité du vin, et donc de sa note. Les températures extrêmes peuvent ainsi avoir un effet négatif sur la qualité. Les différents types de vin réagissent de manière variable aux fluctuations thermiques ; par exemple, le vin rouge est souvent plus résistant aux fortes chaleurs.
+
+
+Pour analyser l’impact des variations de température sur la qualité du vin, nous nous concentrons sur trois mois clés du cycle de maturation du raisin : avril, juin et septembre. Ces mois correspondent respectivement au début de la floraison, à la phase active de croissance et au moment crucial de la vendange. La température durant ces périodes influence fortement le développement des raisins, la concentration des sucres et des arômes, et donc la qualité finale du vin. Ce choix ciblé permet de mieux saisir les effets climatiques essentiels sur la note attribuée aux vins, tout en évitant la dispersion des données sur des périodes moins déterminantes.
+
+```{r question 1, echo=FALSE}
+
+# Colonnes des températures moyennes mensuelles
+months <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+tavg_cols <- paste0(months, "_tavg")
+
+# Sélection des colonnes utiles
+selected_cols <- c("Type", "Rating", "Price", "Year", tavg_cols)
+wines_fusionne <- wines_fusionne %>% select(all_of(selected_cols))
+
+# Ajout des moyennes saisonnières
+wines_fusionne <- wines_fusionne %>%
+  mutate(
+    Spring_tavg = (Mar_tavg + Apr_tavg + May_tavg) / 3,
+    Summer_tavg = (Jun_tavg + Jul_tavg + Aug_tavg) / 3,
+    Autumn_tavg = (Sep_tavg + Oct_tavg + Nov_tavg) / 3,
+    Winter_tavg = (Dec_tavg + Jan_tavg + Feb_tavg) / 3
+  )
+
+
+#1: Scatterplot note vs température moyenne de quelques mois clés par type de vin
+
+# Choix de mois clés, par exemple Avril, Juin, Septembre (période maturation, croissance)
+months_key <- c("Apr_tavg", "Jun_tavg", "Sep_tavg")
+
+
+# Pivot long pour scatterplot
+scatter_data <- wines_fusionne %>%
+  select(Type, Rating, all_of(months_key)) %>%
+  pivot_longer(cols = all_of(months_key),
+               names_to = "Month",
+               values_to = "Temperature")
+
+ggplot(scatter_data, aes(x = Temperature, y = Rating, color = Type)) +
+  geom_point(alpha = 0.4, size = 1) +
+  geom_smooth(method = "loess", se = FALSE) +
+  facet_wrap(~Month, scales = "free_x") +
+  labs(title = "Note du vin vs Température moyenne (mois clés) par type de vin",
+       x = "Température moyenne (°C)",
+       y = "Note") +
+  theme_minimal()
+```
+
+
+On observe que les vins rouges présentent une grande stabilité dans leur note, quelle que soit la température. Cela confirme leur résilience face aux variations climatiques, même lorsque les températures deviennent élevées. Les vins blancs suivent une tendance similaire, bien que légèrement plus sensible, notamment en avril.
+
+En revanche, les vins rosés et pétillants montrent une sensibilité marquée aux températures élevées, avec des courbes en cloche bien visibles : leur note augmente avec la température jusqu’à un certain seuil (souvent autour de 15–20°C), puis diminue au-delà. Cela suggère qu’un excès de chaleur nuit à la qualité de ces vins, en particulier durant les mois de juin et septembre.
+
+Ainsi, ce graphique met en évidence que la température influence différemment la qualité des vins selon leur type, et qu’il existe souvent une zone optimale de température favorisant les meilleures notes, notamment pour les vins plus fragiles.
+
+### 2. Comment les précipitations influencent-elles la qualité des vins ?
+
+On peut imaginer que les précipitations pendant certaines périodes clés du cycle de croissance de la vigne (par exemple, la période de maturation) influencent la qualité du raisin, et donc la note du vin. Une quantité modérée d'eau peut favoriser la croissance, tandis qu’un excès de pluie peut réduire la qualité et faire baisser la note. L’impact peut également varier selon le type de vin : par exemple, les vins rosés ou pétillants pourraient être plus sensibles à une humidité excessive.
+
+Dans l’étude de l’impact des précipitations sur la qualité du vin, il est essentiel de se concentrer sur certaines périodes clés du cycle de croissance de la vigne. En particulier, les mois correspondant à la période de floraison, de nouaison et surtout de maturation du raisin ont une influence majeure sur le développement et la concentration des raisins.
+Nous avons donc choisi d’analyser principalement les précipitations des mois de mai à septembre, qui correspondent généralement à cette phase critique de maturation dans les principales régions viticoles étudiées. Pendant cette période, une quantité modérée d’eau peut favoriser une bonne croissance et un bon équilibre de la vigne, tandis qu’un excès d’eau risque d’entraîner des maladies, une dilution des arômes ou une dégradation de la qualité.
+Cette sélection permet de mieux cerner l’effet des précipitations pendant les périodes les plus sensibles, tout en réduisant le bruit lié aux précipitations hors saison de croissance active.
+
+```{r question2, echo=FALSE}
+# Ajouter une colonne Type pour distinguer les types de vin
+red_qu2 <- red %>% mutate(Type = "Red")
+white_qu2 <- white %>% mutate(Type = "White")
+rose_qu2 <- rose %>% mutate(Type = "Rosé")
+sparkling_qu2 <- sparkling %>% mutate(Type = "Sparkling")
+
+# Fusionner les datasets
+wines <- bind_rows(red_qu2, white_qu2, rose_qu2, sparkling_qu2)
+
+# Sélection des colonnes utiles (incluant les précipitations mensuelles)
+selected_cols <- c("Type", "Rating", "Price", "Year",
+                   "Jan_prcp", "Feb_prcp", "Mar_prcp", "Apr_prcp", "May_prcp", "Jun_prcp",
+                   "Jul_prcp", "Aug_prcp", "Sep_prcp", "Oct_prcp", "Nov_prcp", "Dec_prcp")
+
+wines_selected <- wines %>% select(all_of(selected_cols)) %>% 
+  filter(!is.na(Rating))  # Enlever les vins sans note
+
+
+
+#graphique 1 -Scatterplot — Note vs précipitations de 3 mois clés (avril, juin, septembre)
+
+# Choix des mois clés pour le cycle végétatif de la vigne
+wines_long <- wines_selected %>%
+  pivot_longer(cols = ends_with("_prcp"), 
+               names_to = "Month", values_to = "Precipitation") %>%
+  filter(Month %in% c("Apr_prcp", "Jun_prcp", "Sep_prcp"))
+
+ggplot(wines_long, aes(x = Precipitation, y = Rating, color = Type)) +
+  geom_point(alpha = 0.4, size = 1) +
+  geom_smooth(method = "loess", se = FALSE) +
+  facet_wrap(~ Month, scales = "free_x") +
+  labs(title = "Note des vins vs Précipitations des mois clés",
+       x = "Précipitations (mm)",
+       y = "Note du vin",
+       color = "Type de vin") +
+  theme_minimal()
+```
+
+Ce graphique examine l’effet des précipitations sur la qualité des vins, mesurée par leur note, en se concentrant sur trois mois clés du cycle de la vigne : avril (floraison), juin (croissance active) et septembre (vendanges). L’objectif est de comprendre comment l’humidité à ces périodes influence différemment les types de vin (rouge, blanc, rosé, pétillant).
+
+En avril, les précipitations semblent globalement peu nuisibles, voire légèrement bénéfiques pour certains vins. Les vins rouges montrent une légère augmentation de la note avec l’humidité, suggérant une bonne tolérance à l’eau en début de saison. À l’inverse, les vins pétillants obtiennent de meilleures notes quand les précipitations sont faibles, ce qui indique une certaine sensibilité à l’excès d’humidité dès les premières phases de développement.
+
+En juin, les effets deviennent plus marqués. Les vins rouges montrent une baisse progressive de la note lorsque les précipitations augmentent, ce qui pourrait refléter une sensibilité à un excès d’eau pendant la phase de croissance. Les rosés et les blancs conservent une stabilité relative, tandis que les pétillants présentent une nette chute de la note dès que les précipitations dépassent 3 mm. Cela confirme leur forte vulnérabilité à l’humidité en période de développement actif.
+
+En septembre, mois crucial de la vendange, une tendance générale à la baisse des notes est visible pour presque tous les types de vin lorsque les précipitations augmentent. Ce phénomène est particulièrement marqué pour les pétillants, dont la note décroît nettement avec l’humidité. Les blancs sont également légèrement impactés. Les rouges, en revanche, restent relativement stables, montrant une fois de plus une bonne résistance.
+
+Au global, ce graphique suggère que les vins pétillants sont les plus sensibles à l’excès de pluie, quelle que soit la période. Les vins rouges se montrent plus robustes, notamment en fin de saison, tandis que les blancs et rosés réagissent de manière plus variable. Pour affiner cette analyse, il serait pertinent d'étendre l’étude à l’ensemble des mois de maturation, et de compléter cette visualisation par une mesure quantitative des corrélations entre précipitations et notes, afin d’identifier plus précisément les périodes critiques et les seuils de tolérance.
+
 ### 3.Comment l'ensoleillement influence-t-il la qualité du vin rouge?
 
 -On peut imaginer que des raisins bénéficiant d’un ensoleillement important pendant certains mois clés (comme la période de maturation) produisent des vins mieux notés. Cependant, un ensoleillement excessif, accompagné de chaleur intense, pourrait entraîner une baisse de la qualité.
