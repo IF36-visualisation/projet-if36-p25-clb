@@ -421,6 +421,34 @@ count_Moldova <- wine_data %>%
 
 Si l'on se base simplement sur les résultats que nous apportent les données, on pourrait en conclure que la Moldavie est le pays producteur de vin préféré à l'échelle mondiale. Cependant, il y a une limite à cette représentation, et qui est le nombre d'occurence de chacun des pays. Par exemple, nous avons 13 vins moldaves analysés, face à 3636 italiens. L'ordre de grandeur n'étant pas le même, la comparaison est moins pertinente.
 
+```{r question4b, echo=FALSE}
+# --- Graphique 2 : Top 10 des plus grands producteurs ---
+top_producing_countries <- country_ratings %>%
+  arrange(desc(count)) %>%
+  slice_head(n = 10)
+
+top10_data <- wine_data %>%
+  filter(Country %in% top_producing_countries$Country)
+
+top10_ratings <- top10_data %>%
+  group_by(Country) %>%
+  summarise(mean_rating = mean(Rating, na.rm = TRUE)) %>%
+  arrange(desc(mean_rating))
+
+ggplot(top10_ratings, aes(x = reorder(Country, mean_rating), y = mean_rating)) +
+  geom_col(fill = "#5c9ead") +
+  coord_flip() +
+  labs(title = "Note moyenne des 10 plus grands producteurs de vin",
+       x = "Pays",
+       y = "Note moyenne",
+       caption = "Sources : Red, Rosé, White et Sparkling") +
+  theme_minimal()
+``` 
+
+En se basant cette fois-ci sur les 10 pays ayant le plus grand nombre d’occurrences dans les données, c’est-à-dire les 10 plus grands producteurs de vin représentés dans notre base, on obtient un classement plus pertinent et représentatif de la réalité à l’échelle mondiale. Dans ce nouveau classement, la France apparaît comme le pays dont les vins sont les mieux notés, suivie  par l’Italie, puis les États-Unis, l’Allemagne, le Portugal, l’Autriche, l’Espagne, l’Afrique du Sud, l’Australie et enfin le Chili. Les notes moyennes sont toutes relativement proches.
+
+Ce résultat diffère de notre hypothèse de départ, qui plaçait l’Italie en tête. Bien qu’elle soit le plus grand producteur mondial en volume, l’Italie est ici devancée par la France, ce qui laisse entendre que les vins français sont globalement perçus comme légèrement supérieurs en termes de qualité moyenne. Les États-Unis, bien que leur arrivée sur le marché de la viticulture mondiale soit assez récente, se positionnent également très favorablement, ce qui témoigne de la reconnaissance croissante de leurs productions. On remarque une majorité d'acteurs européens, ce qui n'est pas très étonnant, car ce sont des acteurs implantés depuis longtemps sur le marché du vin.
+
 ### 5.Les vins produits dans des régions avec des conditions météorologiques similaires ont-ils des notes similaires, indépendamment du type de vin ?
 
 - On peut imaginer que les régions disposant des mêmes conditions météorologiques reçoivent les mêmes notes. Le problème que l'on pourrait rencontrer serait celui de l'influence d'autres facteurs comme le prix, ou la réputation de la région.
