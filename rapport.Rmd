@@ -1,10 +1,8 @@
 ---
-title: "Rapport"
+title: "Rapport - Analyse de la qualité de différents vins et des conditions météorologiques des régions de production"
 output:
-  pdf_document:
-    latex_engine: xelatex
-    keep_tex: true
-  html_document: default
+  prettydoc::html_pretty:
+    theme: hpstr
 knitr:
   opts_chunk:
     echo: false
