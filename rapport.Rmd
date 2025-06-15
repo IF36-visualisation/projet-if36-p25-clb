@@ -12,15 +12,13 @@ date: "2024-05-05"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
-# Rapport - Analyse de la qualité de différents vins et des conditions météorologiques des régions de production
-
-## Introduction
+# Introduction
 
 Ce projet vise à explorer et analyser les données concernant la qualité et de l'appréciation de quatre types de vins provenant du monde entier en fonction de leur prix et des conditions météorologiques lors de la croissance des raisins, avec pour objectif la compréhension des facteurs influençant l'évaluation des différent vins. Nous avons trouvé les données sur le site Kaggle et elles incluent des informations détaillées sur le niveau de précipitations, d'ensoleillement, de température minimale, moyenne et maximale.
 
-### Données
+## Données
 
-#### Source
+### Source
 
 Les données que nous avons sélectionnées proviennent du site [Kaggle] (https://www.kaggle.com/datasets/abcd334/wine-growth-weather/data?select=White_Weather.csv). Elles proviennent de quatre fichiers CSV distincts : 'Red_Weather', 'Rose_Weather', 'Sparkling_Weather', 'White_Weather'.
 
@@ -38,15 +36,15 @@ Les datasets présentent les caractéristiques suivantes :
 - **White_Weather** : Ce dataset présente les données recueillies concernant les vins blancs. 
   - *Contenu* : 3759 éléments avec 72 caractéristiques
 
-#### Format des datasets
+### Format des datasets
 
 Chaque dataset est formaté en CSV. Cela facilite l'importation des données, et l'analyse dans divers outils.
 
-#### Catégories et Sous-groupes
+### Catégories et Sous-groupes
 
 Les vins sont séparés selon la catégorie de vin auxquels ils appartiennent (Rouge, Rosé, Pétillant, Blanc) dans des datasets différents. Dans chacun des datasets on remarque deux catégories d'informations : celles concernant le vin, et celle concernant les conditions météorologiques de la ville de provenance sur l'année précédant la production du vin.
 
-#### Caractéristiques des données
+### Caractéristiques des données
 
 Chacun des datasets contiennent les mêmes champs, à l'exception de 'Red_Weather' et 'White_Weather' qui contiennent deux champs en plus, qui sont en fait une recopie de deux autres champs.
 
@@ -73,12 +71,11 @@ Chacun des datasets contiennent les mêmes champs, à l'exception de 'Red_Weathe
 Les features "Jan_tavg", "Jan_tmin", "Jan_tmax", "Jan_prcp" et "Jan_tsun" sont celles qui correspondent au mois de janvier. Il existe les mêmes features pour chacuns des mois de l'année, qui sont nommées avec la structure : [3 premières lettres du mois]_[nom de la donnée météorologique].
 
 
-### Plan d’Analyse
+# Plan d’Analyse
 
 L'analyse des types de données et de leur description nous a amené à nous poser diverses questions, que nous détaillons ci-après. Pour certaines question, il pourra être pertinent de rassembler toutes les données dans une seule et même table.
 
 ## Analyse Exploratoire
-
 ```{r librairies, echo= FALSE, message=FALSE, warning=FALSE}
 # Import des librairies
 library(ggplot2)
@@ -105,7 +102,9 @@ rose_weather <- rose_weather %>% mutate(Type = "Rosé")
 sparkling_weather <- sparkling_weather %>% mutate(Type = "Sparkling")
 wines_fusionne <- bind_rows(red_weather, white_weather, rose_weather, sparkling_weather)
 ```
-### 1. Comment les variations de températures influencent-elles la qualité des vins ?
+### I. Influence des conditions climatiques sur la qualité du vin
+
+#### Comment les variations de températures influencent-elles la qualité des vins ?
 
 On peut imaginer que la température de certains mois, comme la période de maturation du raisin, est fortement corrélée à la note du vin. Lorsque la température augmente, la note du vin peut également augmenter. Cependant, au-delà d’un certain seuil critique, une température trop élevée peut entraîner une baisse de la qualité du vin, et donc de sa note. Les températures extrêmes peuvent ainsi avoir un effet négatif sur la qualité. Les différents types de vin réagissent de manière variable aux fluctuations thermiques ; par exemple, le vin rouge est souvent plus résistant aux fortes chaleurs.
 
@@ -156,14 +155,13 @@ ggplot(scatter_data, aes(x = Temperature, y = Rating, color = Type)) +
   theme_minimal()
 ```
 
-
 On observe que les vins rouges présentent une grande stabilité dans leur note, quelle que soit la température. Cela confirme leur résilience face aux variations climatiques, même lorsque les températures deviennent élevées. Les vins blancs suivent une tendance similaire, bien que légèrement plus sensible, notamment en avril.
 
 En revanche, les vins rosés et pétillants montrent une sensibilité marquée aux températures élevées, avec des courbes en cloche bien visibles : leur note augmente avec la température jusqu’à un certain seuil (souvent autour de 15–20°C), puis diminue au-delà. Cela suggère qu’un excès de chaleur nuit à la qualité de ces vins, en particulier durant les mois de juin et septembre.
 
 Ainsi, ce graphique met en évidence que la température influence différemment la qualité des vins selon leur type, et qu’il existe souvent une zone optimale de température favorisant les meilleures notes, notamment pour les vins plus fragiles.
 
-### 2. Comment les précipitations influencent-elles la qualité des vins ?
+#### Comment les précipitations influencent-elles la qualité des vins ?
 
 On peut imaginer que les précipitations pendant certaines périodes clés du cycle de croissance de la vigne (par exemple, la période de maturation) influencent la qualité du raisin, et donc la note du vin. Une quantité modérée d'eau peut favoriser la croissance, tandis qu’un excès de pluie peut réduire la qualité et faire baisser la note. L’impact peut également varier selon le type de vin : par exemple, les vins rosés ou pétillants pourraient être plus sensibles à une humidité excessive.
 
@@ -220,7 +218,7 @@ En septembre, mois crucial de la vendange, une tendance générale à la baisse 
 
 Au global, ce graphique suggère que les vins pétillants sont les plus sensibles à l’excès de pluie, quelle que soit la période. Les vins rouges se montrent plus robustes, notamment en fin de saison, tandis que les blancs et rosés réagissent de manière plus variable. Pour affiner cette analyse, il serait pertinent d'étendre l’étude à l’ensemble des mois de maturation, et de compléter cette visualisation par une mesure quantitative des corrélations entre précipitations et notes, afin d’identifier plus précisément les périodes critiques et les seuils de tolérance.
 
-### 3.Comment l'ensoleillement influence-t-il la qualité du vin rouge?
+#### Comment l'ensoleillement influence-t-il la qualité des vins ?
 
 -On peut imaginer que des raisins bénéficiant d’un ensoleillement important pendant certains mois clés (comme la période de maturation) produisent des vins mieux notés. Cependant, un ensoleillement excessif, accompagné de chaleur intense, pourrait entraîner une baisse de la qualité.
 
@@ -284,95 +282,9 @@ En Espagne, en revanche, nous constatons une corrélation négative en hiver et 
 
 Ainsi, pour les recherches futures, au lieu d'étudier séparément l'effet de l'ensoleillement, des précipitations et de la température sur la qualité du vin, il serait pertinent d'analyser ces facteurs de manière combinée.
 
-### 4. Il y a t’il un pays producteur préféré à l’échelle mondiale ? 
+### II. Influence du climat à l'échelle régionale
 
-Nous nous attendons à ce que l'Italie soit le pays producteur dont les vins sont les plus appréciés, car c'est le plus gros producteur du monde, mais aussi celui qui subit le moins de conditions météorologiques défavorables. Pour vérifier cela, nous allons calculer la note moyenne attribuée aux vins provenant d'un même pays, afin de comparer les notes moyennes de chacuns des pays. Grâce à cela, nous pourrons obtenir le classement des pays selon les notes que leurs vins ont obtenus, et ainsi en déduire quel est ou quels sont les pays préférés à l'échelle mondiale.
-
-```{r question4a, echo= FALSE}
-# Garder uniquement les colonnes utiles
-red_qu4 <- red %>% select(Country, Rating)
-rose_qu4 <- rose %>% select(Country, Rating)
-sparkling_qu4 <- sparkling %>% select(Country, Rating)
-white_qu4 <- white %>% select(Country, Rating)
-
-# Fusionner les datasets
-wine_data <- bind_rows(red_qu4, rose_qu4, sparkling_qu4, white_qu4)
-
-# Nettoyer les données (ex: retirer NA)
-wine_data <- wine_data %>% filter(!is.na(Country), !is.na(Rating))
-
-# Corriger les noms de pays dans wine_data
-wine_data <- wine_data %>%
-  mutate(Country = case_when(
-    Country == "United States" ~ "United States of America",
-    TRUE ~ Country
-  ))
-
-# Agréger : calculer la moyenne des notes par pays
-country_ratings <- wine_data %>%
-  group_by(Country) %>%
-  summarise(mean_rating = mean(Rating, na.rm = TRUE),
-            count = n()) %>%
-  arrange(desc(mean_rating))
-```
-
-```{r, echo= FALSE}
-# Top 10 des pays
-top_countries <- country_ratings %>%
-  top_n(10, mean_rating)
-
-ggplot(top_countries, aes(x = reorder(Country, mean_rating), y = mean_rating)) +
-  geom_col() +
-  coord_flip() +
-  labs(title = "Top 10 des pays selon la note moyenne de leurs vins",
-       x = "Pays",
-       y = "Note moyenne",
-       caption = "Sources : Red, Rose, White et Sparkling Weather") +
-  theme_minimal()
-
-# Nombre d'occurrences
-count_Moldova <- wine_data %>%
-  filter(Country == 'Moldova') %>%
-  nrow()
-  print(paste("Nombre d'occurences de la Moldavie :",count_Moldova))
-  
-  count_Italy <- wine_data %>%
-    filter(Country == 'Italy') %>%
-    nrow()
-  print(paste("Nombre d'occurences de l'Italie :",count_Italy))
-```
-
-Si l'on se base simplement sur les résultats que nous apportent les données, on pourrait en conclure que la Moldavie est le pays producteur de vin préféré à l'échelle mondiale. Cependant, il y a une limite à cette représentation, et qui est le nombre d'occurence de chacun des pays. Par exemple, nous avons 13 vins moldaves analysés, face à 3636 italiens. L'ordre de grandeur n'étant pas le même, la comparaison est moins pertinente.
-
-```{r question4b, echo=FALSE}
-# --- Graphique 2 : Top 10 des plus grands producteurs ---
-top_producing_countries <- country_ratings %>%
-  arrange(desc(count)) %>%
-  slice_head(n = 10)
-
-top10_data <- wine_data %>%
-  filter(Country %in% top_producing_countries$Country)
-
-top10_ratings <- top10_data %>%
-  group_by(Country) %>%
-  summarise(mean_rating = mean(Rating, na.rm = TRUE)) %>%
-  arrange(desc(mean_rating))
-
-ggplot(top10_ratings, aes(x = reorder(Country, mean_rating), y = mean_rating)) +
-  geom_col(fill = "#5c9ead") +
-  coord_flip() +
-  labs(title = "Note moyenne des 10 plus grands producteurs de vin",
-       x = "Pays",
-       y = "Note moyenne",
-       caption = "Sources : Red, Rosé, White et Sparkling") +
-  theme_minimal()
-``` 
-
-En se basant cette fois-ci sur les 10 pays ayant le plus grand nombre d’occurrences dans les données, c’est-à-dire les 10 plus grands producteurs de vin représentés dans notre base, on obtient un classement plus pertinent et représentatif de la réalité à l’échelle mondiale. Dans ce nouveau classement, la France apparaît comme le pays dont les vins sont les mieux notés, suivie  par l’Italie, puis les États-Unis, l’Allemagne, le Portugal, l’Autriche, l’Espagne, l’Afrique du Sud, l’Australie et enfin le Chili. Les notes moyennes sont toutes relativement proches.
-
-Ce résultat diffère de notre hypothèse de départ, qui plaçait l’Italie en tête. Bien qu’elle soit le plus grand producteur mondial en volume, l’Italie est ici devancée par la France, ce qui laisse entendre que les vins français sont globalement perçus comme légèrement supérieurs en termes de qualité moyenne. Les États-Unis, bien que leur arrivée sur le marché de la viticulture mondiale soit assez récente, se positionnent également très favorablement, ce qui témoigne de la reconnaissance croissante de leurs productions. On remarque une majorité d'acteurs européens, ce qui n'est pas très étonnant, car ce sont des acteurs implantés depuis longtemps sur le marché du vin.
-
-### 5.Les vins produits dans des régions avec des conditions météorologiques similaires ont-ils des notes similaires, indépendamment du type de vin ?
+#### Les vins produits dans des régions avec des conditions météorologiques similaires ont-ils des notes similaires, indépendamment du type de vin ?
 
 - On peut imaginer que les régions disposant des mêmes conditions météorologiques reçoivent les mêmes notes. Le problème que l'on pourrait rencontrer serait celui de l'influence d'autres facteurs comme le prix, ou la réputation de la région.
 
@@ -491,290 +403,7 @@ Cela montre qu’il n’y a pas de divergence marquée ni de polarisation extrê
 
 Nous remarquons également que, dans certaines régions comme Pfalz (2017 et 2018) ou Stellenbosch (2017 et 2018), l’écart-type reste stable d’une année à l’autre.D’un point de vue statistique, cela indique que l’échantillon de données choisi ne présente pas de fluctuations excessives et constitue donc un sous-ensemble fiable et représentatif.
 
-### 6. Le climat est-il le facteur principal de l'appréciation du vin ? 
-
-- On peut imaginer que les régions les plus propices à la croissance adéquate des grains de raisins font les vins les plus appréciés. Le problème pourrait être que la renommée du vin ou son prix entrent en compte inconsciemment dans la note du vin (de manière favorable ou défavorable).
-
-**Graphique 1-3 : Histogramme - Note moyenne VS la température annuelle moyenne, la précipitation annuelle, la durée d’ensoleillement annuelle**
-
-```{r question5d, echo= FALSE}
-
-library(dplyr)
-library(ggplot2)
-
-data_climat <- data %>%
-  rowwise() %>%
-  mutate(
-    Total_prcp = sum(c_across(where(is.numeric) & ends_with("_prcp")), na.rm = TRUE),
-    Total_tsun = sum(c_across(where(is.numeric) & ends_with("_tsun")), na.rm = TRUE),
-    Total_tavg = mean(c_across(where(is.numeric) & ends_with("_tavg")), na.rm = TRUE)
-  ) %>%
-  ungroup()
-
-data_climat <- data_climat %>%
-  mutate(
-    Catégorie_prcp = case_when(
-      Total_prcp < 15 ~ "< 15 mm",
-      Total_prcp < 20 ~ "15–20 mm",
-      Total_prcp < 25 ~ "20–25 mm",
-      Total_prcp < 30 ~ "25–30 mm",
-      TRUE ~ "> 30 mm"
-    ),
-    Catégorie_tsun = case_when(
-      Total_tsun < 360000 ~ "< 360000 sec",
-      Total_tsun < 380000 ~ "360000–380000 sec",
-      Total_tsun < 400000 ~ "380000–400000 sec",
-      Total_tsun < 420000 ~ "400000–420000 sec",
-      TRUE ~ "> 420000 sec"
-    ),
-    Catégorie_tavg = case_when(
-      Total_tavg < 12 ~ "< 12°C",
-      Total_tavg < 13.5 ~ "12–13.5°C",
-      Total_tavg < 15 ~ "13.5–15°C",
-      Total_tavg < 16.5 ~ "15–16.5°C",
-      TRUE ~ "> 16.5°C"
-    )
-  )
-
-data_climat$Catégorie_prcp <- factor(
-  data_climat$Catégorie_prcp,
-  levels = c("< 15 mm", "15–20 mm", "20–25 mm", "25–30 mm", "> 30 mm")
-)
-
-data_climat$Catégorie_tsun <- factor(
-  data_climat$Catégorie_tsun,
-  levels = c("< 360000 sec", "360000–380000 sec", "380000–400000 sec", "400000–420000 sec", "> 420000 sec")
-)
-
-data_climat$Catégorie_tavg <- factor(
-  data_climat$Catégorie_tavg,
-  levels = c("< 12°C", "12–13.5°C", "13.5–15°C", "15–16.5°C", "> 16.5°C")
-)
-
-rating_tavg <- data_climat %>%
-  filter(!is.na(Catégorie_tavg), !is.na(Rating)) %>%
-  group_by(Catégorie_tavg) %>%
-  summarise(Moyenne_note = mean(Rating), .groups = "drop")
-
-rating_prcp <- data_climat %>%
-  filter(!is.na(Catégorie_prcp), !is.na(Rating)) %>%
-  group_by(Catégorie_prcp) %>%
-  summarise(Moyenne_note = mean(Rating), .groups = "drop")
-
-rating_tsun <- data_climat %>%
-  filter(!is.na(Catégorie_tsun), !is.na(Rating)) %>%
-  group_by(Catégorie_tsun) %>%
-  summarise(Moyenne_note = mean(Rating), .groups = "drop")
-
-ggplot(rating_tavg, aes(x = Catégorie_tavg, y = Moyenne_note, fill = Catégorie_tavg)) +
-  geom_col(width = 0.5) +
-  labs(
-    title = "Note moyenne des vins selon la température annuelle moyenne (affinée)",
-    x = "Catégorie de température",
-    y = "Note moyenne"
-  ) +
-  coord_cartesian(ylim = c(3.0, 4.0)) +
-  theme_minimal() +
-  theme(legend.position = "none")
-
-ggplot(rating_prcp, aes(x = Catégorie_prcp, y = Moyenne_note, fill = Catégorie_prcp)) +
-  geom_col(width = 0.5) +
-  labs(
-    title = "Note moyenne des vins selon la précipitation annuelle",
-    x = "Catégorie de précipitation",
-    y = "Note moyenne"
-  ) +
-  coord_cartesian(ylim = c(3.0, 4.0)) +
-  theme_minimal() +
-  theme(legend.position = "none")
-
-ggplot(rating_tsun, aes(x = Catégorie_tsun, y = Moyenne_note, fill = Catégorie_tsun)) +
-  geom_col(width = 0.5) +
-  labs(
-    title = "Note moyenne des vins selon la durée d'ensoleillement annuelle",
-    x = "Catégorie d’ensoleillement",
-    y = "Note moyenne"
-  ) +
-  coord_cartesian(ylim = c(3.0, 4.0)) +
-  theme_minimal() +
-  theme(legend.position = "none")
-```
-
-Les trois graphiques montrent que les conditions climatiques pourraient avoir une influence sur les notes attribuées aux vins :
-
-La température et la durée d’ensoleillement suivent une courbe en cloche, c’est-à-dire que la meilleure moyenne des notes apparaît dans une zone climatique intermédiaire. Cela suggère l’existence d’une zone climatique optimale pour la qualité du vin.
-La précipitation annuelle présente une tendance légèrement croissante, ce qui pourrait indiquer qu’un niveau de précipitation modéré, voire élevé, favorise la qualité du raisin.
-
-Cependant, que ce soit pour la température, l’ensoleillement ou les précipitations, les différences de note moyenne entre les catégories restent très faibles, inférieures à 0,25 point. Cela laisse penser que d’autres facteurs non climatiques influencent probablement les notes des vins.
-
-### 7. Les notes attribuées au vin sont-elles cohérentes vis à vis des conditions météorologiques ou il y a t’il d’autres facteurs qui entrent en compte ? ( prix, popularité de la région de production, pays de provenance, réputé du vin…)
-
-Les notes des vins pourraient être influencées de manière biaisée par le prix ou la provenance géographique, indépendamment de la qualité réelle du vin. On s’attend à ce que les vins plus chers et issus de pays réputés soient en moyenne mieux notés.
-
-Voici des scatter plots montrant la relation entre le prix et la note pour les vins rouges, blancs, rosés et pétilants. 
-
-```{r, echo= FALSE, warning=FALSE, message=FALSE}
-library(ggplot2)
-library(patchwork)
-library(dplyr)
-
-
-# Créer une colonne "Type_FR" pour avoir le nom français dans le graphique
-wines_fusionne$Type_FR <- recode(wines_fusionne$Type,
-                                 "Red" = "Vin Rouge",
-                                 "White" = "Vin Blanc",
-                                 "Rosé" = "Vin Rosé",
-                                 "Sparkling" = "Vin Pétillant")
-
-# Base du plot générique
-base_plot <- function(data, color) {
-  ggplot(data, aes(x = Price, y = Rating, color = Type_FR)) +
-    geom_point(alpha = 0.6) +
-    geom_smooth(method = "lm", se = FALSE, linetype = "dashed", color = "black", fullrange = FALSE) +
-    scale_color_manual(values = color) +
-    xlab("Prix (€)") +
-    ylab("Note attribuée") +
-    theme_minimal() +
-    theme(legend.position = "bottom",
-          plot.title = element_text(hjust = 0.5))
-}
-
-# Créer chaque graphique sans légende propre
-p1 <- base_plot(subset(wines_fusionne, Type == "Red" & Price <= 200), color = c("Vin Rouge" = "red")) +
-  ggtitle("Vin Rouge")
-
-p2 <- base_plot(subset(wines_fusionne, Type == "White" & Price <= 200), color = c("Vin Blanc" = "gold")) +
-  ggtitle("Vin Blanc")
-
-p3 <- base_plot(subset(wines_fusionne, Type == "Rosé" & Price <= 200), color = c("Vin Rosé" = "pink")) +
-  ggtitle("Vin Rosé")
-
-p4 <- base_plot(subset(wines_fusionne, Type == "Sparkling" & Price <= 200), color = c("Vin Pétillant" = "skyblue")) +
-  ggtitle("Vin Pétillant")
-
-# Combiner avec patchwork
-(p1 + p2 + p3 + p4) +
-  plot_layout(ncol = 2, guides = "collect") & 
-  plot_annotation(title = "Relation entre Prix et Note attribuée selon le Type de Vin") &
-  theme(legend.position = "bottom")
-```
-
-On constate que le prix influence légèrement la note pour le vin rouge, mais ce n’est pas un facteur déterminant. Pour les autres types de vin, le prix n’est pas un bon indicateur de qualité perçue. Cela remet donc en question une idée reçue : les vins chers ne sont pas nécessairement mieux notés.
-
-L'analyse n'est donc pas complète, il faudra se penchez ensuite sur le lien entre la note et la provenance du vin.
-
-```{r, echo= FALSE, warning=FALSE, message=FALSE}
-
-library(ggplot2)
-library(dplyr)
-
-
-red_subset <- subset(wines_fusionne, Type == "Red")
-red_subset$Country_FR <- recode(red_subset$Country,
-                                "Italy" = "Italie", "France" = "France", "Spain" = "Espagne", "Portugal" = "Portugal",
-                                "Germany" = "Allemagne", "United States" = "États-Unis", "Argentina" = "Argentine",
-                                "Chile" = "Chili", "Australia" = "Australie", "Austria" = "Autriche",
-                                "South Africa" = "Afrique du Sud", "New Zealand" = "Nouvelle-Zélande", "Greece" = "Grèce",
-                                "Canada" = "Canada", "Hungary" = "Hongrie", "Israel" = "Israël", "Switzerland" = "Suisse",
-                                "Romania" = "Roumanie", "Lebanon" = "Liban", "Croatia" = "Croatie", "Brazil" = "Brésil",
-                                "Uruguay" = "Uruguay", "Bulgaria" = "Bulgarie", "Turkey" = "Turquie", "Slovenia" = "Slovénie",
-                                "Mexico" = "Mexique", "Georgia" = "Géorgie", "Czech Republic" = "République Tchèque",
-                                "England" = "Angleterre", "Japan" = "Japon", "Moldova" = "Moldavie", "China" = "Chine",
-                                "India" = "Inde", "Peru" = "Pérou", "Morocco" = "Maroc", "Cyprus" = "Chypre", "Malta" = "Malte"
-)
-
-valid_countries <- names(table(red_subset$Country_FR))[table(red_subset$Country_FR) >= 5]
-red_subset <- subset(red_subset, Country_FR %in% valid_countries)
-
-ggplot(red_subset, aes(x = reorder(Country_FR, Rating, median), y = Rating)) +
-  geom_boxplot(fill = "lightcoral", color = "black") +
-  ggtitle("Vin Rouge - Répartition des Notes par Pays") +
-  xlab("Pays de provenance") +
-  ylab("Note attribuée") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-white_subset <- subset(wines_fusionne, Type == "White")
-white_subset$Country_FR <- recode(white_subset$Country,
-                                  "Italy" = "Italie", "France" = "France", "Spain" = "Espagne", "Portugal" = "Portugal",
-                                  "Germany" = "Allemagne", "United States" = "États-Unis", "Argentina" = "Argentine",
-                                  "Chile" = "Chili", "Australia" = "Australie", "Austria" = "Autriche",
-                                  "South Africa" = "Afrique du Sud", "New Zealand" = "Nouvelle-Zélande", "Greece" = "Grèce",
-                                  "Canada" = "Canada", "Hungary" = "Hongrie", "Israel" = "Israël", "Switzerland" = "Suisse",
-                                  "Romania" = "Roumanie", "Lebanon" = "Liban", "Croatia" = "Croatie", "Brazil" = "Brésil",
-                                  "Uruguay" = "Uruguay", "Bulgaria" = "Bulgarie", "Turkey" = "Turquie", "Slovenia" = "Slovénie",
-                                  "Mexico" = "Mexique", "Georgia" = "Géorgie", "Czech Republic" = "République Tchèque",
-                                  "England" = "Angleterre", "Japan" = "Japon", "Moldova" = "Moldavie", "China" = "Chine",
-                                  "India" = "Inde", "Peru" = "Pérou", "Morocco" = "Maroc", "Cyprus" = "Chypre", "Malta" = "Malte"
-)
-
-valid_countries <- names(table(white_subset$Country_FR))[table(white_subset$Country_FR) >= 5]
-white_subset <- subset(white_subset, Country_FR %in% valid_countries)
-
-ggplot(white_subset, aes(x = reorder(Country_FR, Rating, median), y = Rating)) +
-  geom_boxplot(fill = "lightgoldenrod", color = "black") +
-  ggtitle("Vin Blanc - Répartition des Notes par Pays") +
-  xlab("Pays de provenance") +
-  ylab("Note attribuée") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-rose_subset <- subset(wines_fusionne, Type == "Rosé")
-rose_subset$Country_FR <- recode(rose_subset$Country,
-                                 "Italy" = "Italie", "France" = "France", "Spain" = "Espagne", "Portugal" = "Portugal",
-                                 "Germany" = "Allemagne", "United States" = "États-Unis", "Argentina" = "Argentine",
-                                 "Chile" = "Chili", "Australia" = "Australie", "Austria" = "Autriche",
-                                 "South Africa" = "Afrique du Sud", "New Zealand" = "Nouvelle-Zélande", "Greece" = "Grèce",
-                                 "Canada" = "Canada", "Hungary" = "Hongrie", "Israel" = "Israël", "Switzerland" = "Suisse",
-                                 "Romania" = "Roumanie", "Lebanon" = "Liban", "Croatia" = "Croatie", "Brazil" = "Brésil",
-                                 "Uruguay" = "Uruguay", "Bulgaria" = "Bulgarie", "Turkey" = "Turquie", "Slovenia" = "Slovénie",
-                                 "Mexico" = "Mexique", "Georgia" = "Géorgie", "Czech Republic" = "République Tchèque",
-                                 "England" = "Angleterre", "Japan" = "Japon", "Moldova" = "Moldavie", "China" = "Chine",
-                                 "India" = "Inde", "Peru" = "Pérou", "Morocco" = "Maroc", "Cyprus" = "Chypre", "Malta" = "Malte"
-)
-
-valid_countries <- names(table(rose_subset$Country_FR))[table(rose_subset$Country_FR) >= 5]
-rose_subset <- subset(rose_subset, Country_FR %in% valid_countries)
-
-ggplot(rose_subset, aes(x = reorder(Country_FR, Rating, median), y = Rating)) +
-  geom_boxplot(fill = "lightpink", color = "black") +
-  ggtitle("Vin Rosé - Répartition des Notes par Pays") +
-  xlab("Pays de provenance") +
-  ylab("Note attribuée") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-sparkling_subset <- subset(wines_fusionne, Type == "Sparkling")
-sparkling_subset$Country_FR <- recode(sparkling_subset$Country,
-                                      "Italy" = "Italie", "France" = "France", "Spain" = "Espagne", "Portugal" = "Portugal",
-                                      "Germany" = "Allemagne", "United States" = "États-Unis", "Argentina" = "Argentine",
-                                      "Chile" = "Chili", "Australia" = "Australie", "Austria" = "Autriche",
-                                      "South Africa" = "Afrique du Sud", "New Zealand" = "Nouvelle-Zélande", "Greece" = "Grèce",
-                                      "Canada" = "Canada", "Hungary" = "Hongrie", "Israel" = "Israël", "Switzerland" = "Suisse",
-                                      "Romania" = "Roumanie", "Lebanon" = "Liban", "Croatia" = "Croatie", "Brazil" = "Brésil",
-                                      "Uruguay" = "Uruguay", "Bulgaria" = "Bulgarie", "Turkey" = "Turquie", "Slovenia" = "Slovénie",
-                                      "Mexico" = "Mexique", "Georgia" = "Géorgie", "Czech Republic" = "République Tchèque",
-                                      "England" = "Angleterre", "Japan" = "Japon", "Moldova" = "Moldavie", "China" = "Chine",
-                                      "India" = "Inde", "Peru" = "Pérou", "Morocco" = "Maroc", "Cyprus" = "Chypre", "Malta" = "Malte"
-)
-
-valid_countries <- names(table(sparkling_subset$Country_FR))[table(sparkling_subset$Country_FR) >= 5]
-sparkling_subset <- subset(sparkling_subset, Country_FR %in% valid_countries)
-
-ggplot(sparkling_subset, aes(x = reorder(Country_FR, Rating, median), y = Rating)) +
-  geom_boxplot(fill = "lightskyblue", color = "black") +
-  ggtitle("Vin Pétillant - Répartition des Notes par Pays") +
-  xlab("Pays de provenance") +
-  ylab("Note attribuée") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
-Nous pouvons voir que la provenance du vin a une certaine influence sur les notes. En effet, les vins en provenance de France et d'Italie sont très souvent parmis les mikeux notés. Cependant des pays comme l'Autriche ou encore le Géorgie produisent de bons vins blancs, rouges et rosé. ces pays ne nous viennent pas en tête lorsqu'on pense aux bons producteurs de vin, ce qui laisse penser que d'autres critères rentrent en jeu. 
-
-### 8. Y a-t-il des régions productrices davantage impactées par le changement climatique ? Si oui, cela apparaît-il dans la notation du vin ?
+#### Y a-t-il des régions productrices davantage impactées par le changement climatique ? Si oui, cela apparaît-il dans la notation du vin ?
 
 On peut imaginer que certaines régions sont plus impactées que d'autres par le dérèglement climatique, et que des régions productrices en font partie. Nous souhaitons vérifier ceci en étudiant les différences de conditions météorologiques au fil des années et selon les régions. Puis, si certaines se démarquent, nous souhaitons étudier l'évolution des notations du vin en fonction des années pour vérifier s'il y a une corrélation. On peut imaginer que certaines régions qui sont davantage impactée par notamment la hausse des températures ou l'augmentation des précipitations auront des notations de vin en baisse au fil des années.
 
@@ -831,7 +460,99 @@ ggplot(wines_top_pays, aes(x = Year, y = Rating, color = Country)) +
 
 On constate donc une baisse de la note des vins en général, particulièrement frappant pour le cas de l'Italie et de l'Australie, mais cette visualisation ne permet pas d'être précise car elle ne trace les lignes de tendance que de 3 pays. De plus, il faudrait croiser cette analyse avec une visualition de l'impact du changement climatique sur les différentes régions/ pays. 
 
-### 9. Y a-t-il une corrélation entre les conditions météorologiques et les préférences des consommateurs pour certains types de vin ?
+#### Existe-t-il une relation entre la variabilité interannuelle des conditions météorologiques et la constance de la qualité des vins produits dans une région donnée ?
+
+### III. Perception et préférences des consommateurs 
+
+#### Il y a t’il un pays producteur préféré à l’échelle mondiale ? 
+
+Nous nous attendons à ce que l'Italie soit le pays producteur dont les vins sont les plus appréciés, car c'est le plus gros producteur du monde, mais aussi celui qui subit le moins de conditions météorologiques défavorables. Pour vérifier cela, nous allons calculer la note moyenne attribuée aux vins provenant d'un même pays, afin de comparer les notes moyennes de chacuns des pays. Grâce à cela, nous pourrons obtenir le classement des pays selon les notes que leurs vins ont obtenus, et ainsi en déduire quel est ou quels sont les pays préférés à l'échelle mondiale.
+
+```{r question4a, echo= FALSE}
+# Garder uniquement les colonnes utiles
+red_qu4 <- red %>% select(Country, Rating)
+rose_qu4 <- rose %>% select(Country, Rating)
+sparkling_qu4 <- sparkling %>% select(Country, Rating)
+white_qu4 <- white %>% select(Country, Rating)
+
+# Fusionner les datasets
+wine_data <- bind_rows(red_qu4, rose_qu4, sparkling_qu4, white_qu4)
+
+# Nettoyer les données (ex: retirer NA)
+wine_data <- wine_data %>% filter(!is.na(Country), !is.na(Rating))
+
+# Corriger les noms de pays dans wine_data
+wine_data <- wine_data %>%
+  mutate(Country = case_when(
+    Country == "United States" ~ "United States of America",
+    TRUE ~ Country
+  ))
+
+# Agréger : calculer la moyenne des notes par pays
+country_ratings <- wine_data %>%
+  group_by(Country) %>%
+  summarise(mean_rating = mean(Rating, na.rm = TRUE),
+            count = n()) %>%
+  arrange(desc(mean_rating))
+```
+
+```{r, echo= FALSE}
+# Top 10 des pays
+top_countries <- country_ratings %>%
+  top_n(10, mean_rating)
+
+ggplot(top_countries, aes(x = reorder(Country, mean_rating), y = mean_rating)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "Top 10 des pays selon la note moyenne de leurs vins",
+       x = "Pays",
+       y = "Note moyenne",
+       caption = "Sources : Red, Rose, White et Sparkling Weather") +
+  theme_minimal()
+
+# Nombre d'occurrences
+count_Moldova <- wine_data %>%
+  filter(Country == 'Moldova') %>%
+  nrow()
+  print(paste("Nombre d'occurences de la Moldavie :",count_Moldova))
+  
+  count_Italy <- wine_data %>%
+    filter(Country == 'Italy') %>%
+    nrow()
+  print(paste("Nombre d'occurences de l'Italie :",count_Italy))
+```
+
+Si l'on se base simplement sur les résultats que nous apportent les données, on pourrait en conclure que la Moldavie est le pays producteur de vin préféré à l'échelle mondiale. Cependant, il y a une limite à cette représentation, et qui est le nombre d'occurence de chacun des pays. Par exemple, nous avons 13 vins moldaves analysés, face à 3636 italiens. L'ordre de grandeur n'étant pas le même, la comparaison est moins pertinente.
+
+```{r question4b, echo=FALSE}
+# --- Graphique 2 : Top 10 des plus grands producteurs ---
+top_producing_countries <- country_ratings %>%
+  arrange(desc(count)) %>%
+  slice_head(n = 10)
+
+top10_data <- wine_data %>%
+  filter(Country %in% top_producing_countries$Country)
+
+top10_ratings <- top10_data %>%
+  group_by(Country) %>%
+  summarise(mean_rating = mean(Rating, na.rm = TRUE)) %>%
+  arrange(desc(mean_rating))
+
+ggplot(top10_ratings, aes(x = reorder(Country, mean_rating), y = mean_rating)) +
+  geom_col(fill = "#5c9ead") +
+  coord_flip() +
+  labs(title = "Note moyenne des 10 plus grands producteurs de vin",
+       x = "Pays",
+       y = "Note moyenne",
+       caption = "Sources : Red, Rosé, White et Sparkling") +
+  theme_minimal()
+``` 
+
+En se basant cette fois-ci sur les 10 pays ayant le plus grand nombre d’occurrences dans les données, c’est-à-dire les 10 plus grands producteurs de vin représentés dans notre base, on obtient un classement plus pertinent et représentatif de la réalité à l’échelle mondiale. Dans ce nouveau classement, la France apparaît comme le pays dont les vins sont les mieux notés, suivie  par l’Italie, puis les États-Unis, l’Allemagne, le Portugal, l’Autriche, l’Espagne, l’Afrique du Sud, l’Australie et enfin le Chili. Les notes moyennes sont toutes relativement proches.
+
+Ce résultat diffère de notre hypothèse de départ, qui plaçait l’Italie en tête. Bien qu’elle soit le plus grand producteur mondial en volume, l’Italie est ici devancée par la France, ce qui laisse entendre que les vins français sont globalement perçus comme légèrement supérieurs en termes de qualité moyenne. Les États-Unis, bien que leur arrivée sur le marché de la viticulture mondiale soit assez récente, se positionnent également très favorablement, ce qui témoigne de la reconnaissance croissante de leurs productions. On remarque une majorité d'acteurs européens, ce qui n'est pas très étonnant, car ce sont des acteurs implantés depuis longtemps sur le marché du vin.
+
+#### Y a-t-il une corrélation entre les conditions météorologiques et les préférences des consommateurs pour certains types de vin ?
 - On peut imaginer que les raisins des vins préférés par les consommateurs ont poussé dans des conditions météorologiques similaires. Pour aller plus loin, nous pouvons étudier si c'est le cas pour tous les types de vin.
 
 Pour répondre à cette question, nous allons analyser les corrélations entre les conditions météorologiques et les notes attribuées aux différents types de vin. Nous allons étudier les corrélations par rapport aux températures moyennes, aux précipitations et à l'ensoleillement.
@@ -898,9 +619,9 @@ Les scatter plots montrent que les températures modérées sont généralement 
 
 Ces observations indiquent que les conditions météorologiques jouent un rôle significatif dans la qualité perçue des vins.
 
+### IV. Années exceptionnelles et prédictions de qualité
 
-
-### 11. Y a-t-il réellement des "bonnes années" où toutes les conditions météorologiques sont idéales pour tous les types de vin ? Les vignes cultivées dans des conditions optimales produisent elles des vins plus appréciés lors des notations ?
+#### Y a-t-il réellement des "bonnes années" où toutes les conditions météorologiques sont idéales pour tous les types de vin ? Les vignes cultivées dans des conditions optimales produisent elles des vins plus appréciés lors des notations ?
 
 On s’attend à ce que certaines années se démarquent avec des conditions climatiques idéales (températures moyennes modérées, peu de précipitations pendant la floraison et la récolte, bon ensoleillement), et qu’elles soient associées à des notes plus élevées. On pourrait observer un pic global de notes dans ces “bonnes années”. Il faudra agréger les données météo sur l’année, les normaliser, puis les relier aux moyennes de notes par millésime.
 
@@ -1130,7 +851,7 @@ print(p3)
 
 La qualité moyenne évaluée des vins s’est globalement érodée au cours des quinze dernières années, et la hiérarchie traditionnelle (rouges + effervescents en tête, puis blancs, rosés) s’est estompée, pour laisser place aujourd’hui à une quasi-uniformisation autour de la note 3,80–3,90, toutes catégories confondues.
 
-### 12. Peut-on prédire la popularité future d'un vin en fonction des conditions météorologiques de l'année de production ?
+#### Peut-on prédire la popularité future d'un vin en fonction des conditions météorologiques de l'année de production ?
 
 On examine ici les relations entre les données météorologiques (température, précipitations, ensoleillement) et les notes de qualité attribuées aux vins sur une période étendue.
 
