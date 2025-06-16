@@ -678,6 +678,73 @@ Les scatter plots montrent que les températures modérées sont généralement 
 
 Ces observations indiquent que les conditions météorologiques jouent un rôle significatif dans la qualité perçue des vins.
 
+#### Existe-t-il une relation entre la variabilité interannuelle des conditions météorologiques et la constance de la qualité des vins produits dans une région donnée ?
+
+
+Nous allons analyser la variabilité interannuelle des conditions météorologiques et la constance de la qualité des vins produits dans différentes régions.
+
+{r question 10}
+library(dplyr)
+library(ggplot2)
+
+# Charger les données avec suppression des messages de spécification
+red <- read_csv("Red_Weather.csv", show_col_types = FALSE) %>% mutate(Type = "Red")
+white <- read_csv("White_Weather.csv", show_col_types = FALSE) %>% mutate(Type = "White")
+rose <- read_csv("Rose_Weather.csv", show_col_types = FALSE) %>% mutate(Type = "Rose")
+sparkling <- read_csv("Sparkling_Weather.csv", show_col_types = FALSE) %>% mutate(Type = "Sparkling")
+
+# Fusionner les datasets
+wines <- bind_rows(red, white, rose, sparkling)
+
+# Calculer l'écart-type de température pour chaque observation
+wines <- wines %>%
+  mutate(
+    SD_Temp = sd(c_across(ends_with("_tavg")), na.rm = TRUE),
+    .by = c(Region, Year)  # Calculer par région et année
+  )
+
+# Créer des catégories d'écart-type de température
+wines <- wines %>%
+  mutate(SD_Temp_Cat = case_when(
+    SD_Temp < 2 ~ "Faible (0-2)",
+    SD_Temp >= 2 & SD_Temp < 4 ~ "Modérée (2-4)",
+    SD_Temp >= 4 ~ "Élevée (4+)"
+  ))
+# Sélectionner les régions avec le plus grand nombre d'observations
+top_regions <- wines %>%
+  group_by(Region) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  arrange(desc(Count)) %>%
+  head(10) %>%
+  pull(Region)
+
+# Filtrer les données pour les régions sélectionnées
+wines_filtered <- wines %>%
+  filter(Region %in% top_regions)
+
+# Créer les boxplots
+ggplot(wines_filtered, aes(x = reorder(Region, Rating, median), y = Rating, fill = SD_Temp_Cat)) +
+  geom_boxplot() +
+  labs(
+    title = "Relation entre la variabilité climatique et la qualité des vins",
+    subtitle = "Top 10 des régions avec le plus grand nombre d'observations",
+    x = "Région",
+    y = "Note",
+    fill = "Variabilité climatique"
+  ) +
+  scale_fill_manual(values = c("Faible (0-2)" = "darkgreen",
+                              "Modérée (2-4)" = "gold",
+                              "Élevée (4+)" = "red")) +
+ theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+
+
 ### IV. Années exceptionnelles et prédictions de qualité
 
 #### Y a-t-il réellement des "bonnes années" où toutes les conditions météorologiques sont idéales pour tous les types de vin ? Les vignes cultivées dans des conditions optimales produisent elles des vins plus appréciés lors des notations ?
@@ -708,7 +775,7 @@ load_wine_data <- function(file_path, wine_type) {
 # Chargement des 4 datasets météo
 red_data <- load_wine_data("Red_Weather.csv", "Rouge")
 rose_data <- load_wine_data("Rose_Weather.csv", "Rosé")
-sparkling_data <- load_wine_data("Sparkling_Weather.csv", "Effervescent")
+sparkling_data <- load_wine_data("Sparkling_Weather.csv", "Pétillant")
 white_data <- load_wine_data("White_Weather.csv", "Blanc")
 
 # Combinaison de tous les datasets
@@ -852,7 +919,7 @@ p3 <- ggplot(climate_data, aes(x = Year, y = note_moyenne, color = Type)) +
   geom_point(aes(size = n_vins), alpha = 0.6) +
   
   scale_color_manual(values = c("Rouge" = "#8B0000", "Blanc" = "#FFD700", 
-                                "Rosé" = "#FF69B4", "Effervescent" = "#00CED1")) +
+                                "Rosé" = "#FF69B4", "Pétillant" = "#00CED1")) +
   scale_size_continuous(name = "Nb vins", range = c(1, 4)) +
   
   labs(
@@ -908,7 +975,7 @@ On observe une tendance claire : plus l’indice climatique optimal est élevé,
 print(p3)
 ```
 
-La qualité moyenne évaluée des vins s’est globalement érodée au cours des quinze dernières années, et la hiérarchie traditionnelle (rouges + effervescents en tête, puis blancs, rosés) s’est estompée, pour laisser place aujourd’hui à une quasi-uniformisation autour de la note 3,80–3,90, toutes catégories confondues.
+La qualité moyenne évaluée des vins s’est globalement érodée au cours des quinze dernières années, et la hiérarchie traditionnelle (rouges + pétillants en tête, puis blancs, rosés) s’est estompée, pour laisser place aujourd’hui à une quasi-uniformisation autour de la note 3,80–3,90, toutes catégories confondues.
 
 #### Peut-on prédire la popularité future d'un vin en fonction des conditions météorologiques de l'année de production ?
 
@@ -943,7 +1010,7 @@ load_wine_data <- function(file_path, wine_type) {
 # Chargement des 4 datasets
 red_data <- load_wine_data("Red_Weather.csv", "Rouge")
 rose_data <- load_wine_data("Rose_Weather.csv", "Rosé")
-sparkling_data <- load_wine_data("Sparkling_Weather.csv", "Effervescent")
+sparkling_data <- load_wine_data("Sparkling_Weather.csv", "pétillant")
 white_data <- load_wine_data("White_Weather.csv", "Blanc")
 
 # Combinaison de tous les datasets
