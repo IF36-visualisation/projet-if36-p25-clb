@@ -505,7 +505,7 @@ ggplot(wines_top_pays, aes(x = Year, y = Rating, color = Country)) +
 
 On constate donc une baisse de la note des vins en général, particulièrement frappant pour le cas de l'Italie et de l'Australie, mais cette visualisation ne permet pas d'être précise car elle ne trace les lignes de tendance que de 3 pays. De plus, il faudrait croiser cette analyse avec une visualition de l'impact du changement climatique sur les différentes régions/ pays. 
 
-#### Existe-t-il une relation entre la variabilité interannuelle des conditions météorologiques et la constance de la qualité des vins produits dans une région donnée ?
+
 
 ### III. Perception et préférences des consommateurs 
 
@@ -673,9 +673,8 @@ print(p2)
 print(p3)
 ```
 
-Les scatter plots montrent que les températures modérées sont généralement associées à des notes plus élevées, particulièrement pour les vins rouges et blancs, suggérant que ces types de vin bénéficient de conditions climatiques équilibrées. Concernant les précipitations, un niveau modéré semble favoriser des notes plus élevées, tandis qu'un excès ou un manque de précipitations peut nuire à la qualité du vin. Enfin, un ensoleillement modéré à élevé est généralement associé à des notes plus élevées, bien qu'un ensoleillement excessif puisse parfois avoir un impact négatif.
-
-Ces observations indiquent que les conditions météorologiques jouent un rôle significatif dans la qualité perçue des vins.
+Les graphiques suggèrent une corrélation entre les conditions météorologiques et les notes moyennes des différents types de vin. Les températures modérées semblent favoriser une meilleure qualité selon les utilisateurs, notamment pour les rouges et les blancs, probablement parce qu’elles permettent une maturation plus équilibrée des raisins. Un niveau de précipitations équilibré est également associé à de meilleures notes, tandis qu’un excès ou un trop peu peut affecter négativement la qualité. Concernant l’ensoleillement, une exposition modérée à élevée paraît bénéfique, bien qu’un excès puisse nuire à la finesse des arômes. Ce graphique ne révèle donc rien de très surprenant.
+Ces tendances montrent donc bien que les conditions climatiques influencent la qualité des vins, et donc potentiellement les préférences des consommateurs. Toutefois, d’autres facteurs entrent en compte : le cépage, le terroir et evidement les préférences des utilisateurs, qui, il ne faut pas l'oublier, sont aussi faconnées par leur culture.
 
 #### Existe-t-il une relation entre la variabilité interannuelle des conditions météorologiques et la constance de la qualité des vins produits dans une région donnée ?
 
@@ -739,6 +738,12 @@ ggplot(wines_filtered, aes(x = reorder(Region, Rating, median), y = Rating, fill
       "White" = "gold",
       "Rose" = "pink",
       "Sparkling" = "skyblue"
+    ),
+    labels = c(
+      "Red" = "Rouge",
+      "White" = "Blanc",
+      "Rose" = "Rosé",
+      "Sparkling" = "Pétillant"
     ),
     na.value = "grey"  # pour les types non spécifiés (optionnel)
   ) +
