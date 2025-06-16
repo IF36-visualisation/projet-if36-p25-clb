@@ -616,9 +616,7 @@ On peut imaginer que les raisins des vins préférés par les consommateurs ont 
 Pour répondre à cette question, nous allons analyser les corrélations entre les conditions météorologiques et les notes attribuées aux différents types de vin. Nous allons étudier les corrélations par rapport aux températures moyennes, aux précipitations et à l'ensoleillement.
 
 
-*Graphique : Scatter plot, en étudiant les conditions météorologiques en fonction des notations pour chaque type de vin. Nous pouvons étudier les corrélations par rapport aux températures moyennes, selon les précipitations, et selon l'ensoleillement.*
-
-```{r question 9, echo=FALSE, warning=FALSE, message=FALSE}
+```{r question 8, echo=FALSE, warning=FALSE, message=FALSE}
 
 library(ggplot2)
 library(dplyr)
@@ -750,7 +748,9 @@ ggplot(wines_filtered, aes(x = reorder(Region, Rating, median), y = Rating, fill
     panel.grid.minor = element_blank()
   )
 
+Certaines régions semblent produire des vins avec une qualité assez stable, ce qui pourrait correspondre à une faible variabilité climatique. D’autres, au contraire, ont une qualité plus irrégulière, possiblement liée à des conditions météo plus changeantes d’une année à l’autre. Il convient cependant de nuancer cette analyse. Tous les vins n'ont pas la même sensibilité aux changements climatique de leur région, comme les vins blancs ou pétillants, qui sont en général moins sensibles aux variations de température car ils sont récoltés plus tôt dans la saison,ainsi, ils sont moins exposés aux périodes extrêmes de chaleur ou de sécheresse, ce qui limite les variations dues au climat... Il faudrait aussi prendre en compte un détail important : l'adaptibilité des vignerons. Certains changent les dates de vendanges, sélectionnent différemment les raisins ou font des assemblages pour garder une qualité constante, même si le climat change, mais nous n'avons pas accès à ces informations à travers notre jeu de data.
 
+Ainsi, pour résumer nous pourrions dire que en effet la variabilité climatique peut avoir un impact sur la constance de la qualité des vins, mais ce n’est pas le seul facteur. Le type de vin, les cépages utilisés, et surtout le savoir-faire local jouent aussi un rôle très important.
 
 
 ### IV. Années exceptionnelles et prédictions de qualité
