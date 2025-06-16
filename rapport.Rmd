@@ -642,6 +642,13 @@ wines_summary <- wines %>%
     Avg_Sunshine = mean(c_across(ends_with("_tsun")), na.rm = TRUE),
     .groups = "drop"
   )
+# Définir la palette de couleurs personnalisée
+custom_colors <- c(
+  "Red" = "red",
+  "White" = "gold",
+  "Rose" = "pink",
+  "Sparkling" = "skyblue"
+
 # Créer les scatter plots
 p1 <- ggplot(wines_summary, aes(x = Avg_Temp, y = Avg_Rating, color = Type)) +
   geom_point() +
