@@ -1222,3 +1222,7 @@ Hiérarchisation des facteurs : [Ensoleillement/Température] semble plus import
 Effets différentiels : L'impact des mêmes conditions varie selon la saison
 
 Si la météorologie constitue un facteur significatif de la qualité viticole, elle ne représente qu'une composante d'un système complexe. L'excellence du vin résulte de l'interaction harmonieuse entre conditions climatiques favorables et savoir-faire humain, rappelant que derrière chaque grand millésime se cachent autant l'art du vigneron que les caprices de la nature.
+
+### Annexe : 
+
+Maxime Le Gal : j'ai fais les visualisations pour les questions 9, 11 et 12 du readme. J'ai effectué les modifications nécessaires pour la bonne exécution du rapport ainsi que le bon affichage de ce dernier. J'ai également été chargé de réaliser les visualisations sur Le logiciel Tableau afin de le comparer à R.
