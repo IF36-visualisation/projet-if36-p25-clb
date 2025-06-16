@@ -495,11 +495,12 @@ ggplot(wines_top_pays, aes(x = Year, y = Rating, color = Country)) +
   geom_point(alpha = 0.6) +
   geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
   labs(
-    title = "Évolution des Notes des Vins dans les Pays les Plus Impactés",
+    title = "Évolution des notes des vins dans les pays les plus impactés",
     x     = "Année",
     y     = "Note du Vin"
   ) +
-  theme_minimal()
+  theme_minimal()+
+  scale_fill_manual(values = rainbow(10)) 
 ```
 
 On constate donc une baisse de la note des vins en général, particulièrement frappant pour le cas de l'Italie et de l'Australie, mais cette visualisation ne permet pas d'être précise car elle ne trace les lignes de tendance que de 3 pays. De plus, il faudrait croiser cette analyse avec une visualition de l'impact du changement climatique sur les différentes régions/ pays. 
