@@ -683,9 +683,9 @@ Ces observations indiquent que les conditions météorologiques jouent un rôle 
 
 Nous allons analyser la variabilité interannuelle des conditions météorologiques et la constance de la qualité des vins produits dans différentes régions.
 
-{r question 10}
 library(dplyr)
 library(ggplot2)
+library(readr)  # Assurez-vous que read_csv est bien disponible
 
 # Charger les données avec suppression des messages de spécification
 red <- read_csv("Red_Weather.csv", show_col_types = FALSE) %>% mutate(Type = "Red")
@@ -696,20 +696,21 @@ sparkling <- read_csv("Sparkling_Weather.csv", show_col_types = FALSE) %>% mutat
 # Fusionner les datasets
 wines <- bind_rows(red, white, rose, sparkling)
 
-# Calculer l'écart-type de température pour chaque observation
+# Calculer l'écart-type de température pour chaque observation (par région et année)
 wines <- wines %>%
   mutate(
     SD_Temp = sd(c_across(ends_with("_tavg")), na.rm = TRUE),
-    .by = c(Region, Year)  # Calculer par région et année
+    .by = c(Region, Year)
   )
 
-# Créer des catégories d'écart-type de température
+# Créer des catégories d'écart-type de température (optionnel si on ne les utilise plus)
 wines <- wines %>%
   mutate(SD_Temp_Cat = case_when(
     SD_Temp < 2 ~ "Faible (0-2)",
     SD_Temp >= 2 & SD_Temp < 4 ~ "Modérée (2-4)",
     SD_Temp >= 4 ~ "Élevée (4+)"
   ))
+
 # Sélectionner les régions avec le plus grand nombre d'observations
 top_regions <- wines %>%
   group_by(Region) %>%
@@ -722,26 +723,33 @@ top_regions <- wines %>%
 wines_filtered <- wines %>%
   filter(Region %in% top_regions)
 
-# Créer les boxplots
-ggplot(wines_filtered, aes(x = reorder(Region, Rating, median), y = Rating, fill = SD_Temp_Cat)) +
+# Créer les boxplots avec couleur par type de vin
+ggplot(wines_filtered, aes(x = reorder(Region, Rating, median), y = Rating, fill = Type)) +
   geom_boxplot() +
   labs(
-    title = "Relation entre la variabilité climatique et la qualité des vins",
+    title = "Relation entre le type de vin et la qualité selon les régions",
     subtitle = "Top 10 des régions avec le plus grand nombre d'observations",
     x = "Région",
     y = "Note",
-    fill = "Variabilité climatique"
+    fill = "Type de vin"
   ) +
-  scale_fill_manual(values = c("Faible (0-2)" = "darkgreen",
-                              "Modérée (2-4)" = "gold",
-                              "Élevée (4+)" = "red")) +
- theme_minimal() +
+  scale_fill_manual(
+    values = c(
+      "Red" = "red",
+      "White" = "gold",
+      "Rose" = "pink",
+      "Sparkling" = "skyblue"
+    ),
+    na.value = "grey"  # pour les types non spécifiés (optionnel)
+  ) +
+  theme_minimal() +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "bottom",
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank()
-  )
+  )
+
 
 
 
