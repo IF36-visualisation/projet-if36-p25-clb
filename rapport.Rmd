@@ -610,7 +610,7 @@ En se basant cette fois-ci sur les 10 pays ayant le plus grand nombre d’occurr
 
 Ce résultat diffère de notre hypothèse de départ, qui plaçait l’Italie en tête. Bien qu’elle soit le plus grand producteur mondial en volume, l’Italie est ici devancée par la France, ce qui laisse entendre que les vins français sont globalement perçus comme légèrement supérieurs en termes de qualité moyenne. Les États-Unis, bien que leur arrivée sur le marché de la viticulture mondiale soit assez récente, se positionnent également très favorablement, ce qui témoigne de la reconnaissance croissante de leurs productions. On remarque une majorité d'acteurs européens, ce qui n'est pas très étonnant, car ce sont des acteurs implantés depuis longtemps sur le marché du vin.
 
-#### Y a-t-il une corrélation entre les conditions météorologiques et les préférences des consommateurs pour certains types de vin ?
+#### Il y a t'il une corrélation entre les conditions météorologiques et les préférences des consommateurs pour certains types de vin ?
 
 On peut imaginer que les raisins des vins préférés par les consommateurs ont poussé dans des conditions météorologiques similaires. Pour aller plus loin, nous pouvons étudier si c'est le cas pour tous les types de vin.
 
@@ -770,7 +770,7 @@ Ainsi, pour résumer nous pourrions dire que en effet la variabilité climatique
 
 ### IV. Années exceptionnelles et prédictions de qualité
 
-#### Y a-t-il réellement des "bonnes années" où toutes les conditions météorologiques sont idéales pour tous les types de vin ? Les vignes cultivées dans des conditions optimales produisent elles des vins plus appréciés lors des notations ?
+#### Il y a t'il réellement des "bonnes années" où toutes les conditions météorologiques sont idéales pour tous les types de vin ? Les vignes cultivées dans des conditions optimales produisent elles des vins plus appréciés lors des notations ?
 
 On s’attend à ce que certaines années se démarquent avec des conditions climatiques idéales (températures moyennes modérées, peu de précipitations pendant la floraison et la récolte, bon ensoleillement), et qu’elles soient associées à des notes plus élevées. On pourrait observer un pic global de notes dans ces “bonnes années”. Il faudra agréger les données météo sur l’année, les normaliser, puis les relier aux moyennes de notes par millésime.
 
