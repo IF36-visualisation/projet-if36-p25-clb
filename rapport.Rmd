@@ -926,8 +926,8 @@ p3 <- ggplot(climate_data, aes(x = Year, y = note_moyenne, color = Type)) +
   geom_line(size = 1) +
   geom_point(aes(size = n_vins), alpha = 0.6) +
   
-  scale_color_manual(values = c("Rouge" = "#8B0000", "Blanc" = "#FFD700", 
-                                "Rosé" = "#FF69B4", "Pétillant" = "#00CED1")) +
+  scale_color_manual(values = c("Rouge" = "red", "Blanc" = "gold", 
+                                "Rosé" = "pink", "Pétillant" = "skyblue")) +
   scale_size_continuous(name = "Nb vins", range = c(1, 4)) +
   
   labs(
