@@ -451,7 +451,7 @@ On peut imaginer que certaines régions sont plus impactées que d'autres par le
 
 Voici un scatterplot illustrant la relation entre les notes attribuées au vin et leurs pays d'origine. Il est compliqué d'envisager l'entierté de la question et ses enjeux à travers un seul graphique, étant donné qu'elle comprend plus de deux variables
 
-```{r question 8, echo= FALSE, warning=FALSE, message=FALSE, results='hide'}
+```{r question 8a, echo= FALSE, warning=FALSE, message=FALSE, results='hide'}
 
 # Fusionner tous les datasets
 wines_fusionne <- bind_rows(red, white, rose, sparkling)
@@ -616,7 +616,7 @@ On peut imaginer que les raisins des vins préférés par les consommateurs ont 
 Pour répondre à cette question, nous allons analyser les corrélations entre les conditions météorologiques et les notes attribuées aux différents types de vin. Nous allons étudier les corrélations par rapport aux températures moyennes, aux précipitations et à l'ensoleillement.
 
 
-```{r question 8, echo=FALSE, warning=FALSE, message=FALSE}
+```{r question 8b, echo=FALSE, warning=FALSE, message=FALSE}
 
 library(ggplot2)
 library(dplyr)
@@ -681,6 +681,7 @@ Ces observations indiquent que les conditions météorologiques jouent un rôle 
 
 Nous allons analyser la variabilité interannuelle des conditions météorologiques et la constance de la qualité des vins produits dans différentes régions.
 
+```{r question 10a, echo= FALSE, warning=FALSE, message=FALSE, results='hide'}
 library(dplyr)
 library(ggplot2)
 library(readr)  # Assurez-vous que read_csv est bien disponible
@@ -747,6 +748,7 @@ ggplot(wines_filtered, aes(x = reorder(Region, Rating, median), y = Rating, fill
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank()
   )
+```
 
 Certaines régions semblent produire des vins avec une qualité assez stable, ce qui pourrait correspondre à une faible variabilité climatique. D’autres, au contraire, ont une qualité plus irrégulière, possiblement liée à des conditions météo plus changeantes d’une année à l’autre. Il convient cependant de nuancer cette analyse. Tous les vins n'ont pas la même sensibilité aux changements climatique de leur région, comme les vins blancs ou pétillants, qui sont en général moins sensibles aux variations de température car ils sont récoltés plus tôt dans la saison,ainsi, ils sont moins exposés aux périodes extrêmes de chaleur ou de sécheresse, ce qui limite les variations dues au climat... Il faudrait aussi prendre en compte un détail important : l'adaptibilité des vignerons. Certains changent les dates de vendanges, sélectionnent différemment les raisins ou font des assemblages pour garder une qualité constante, même si le climat change, mais nous n'avons pas accès à ces informations à travers notre jeu de data.
 
