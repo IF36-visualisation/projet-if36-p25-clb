@@ -1225,4 +1225,16 @@ Si la météorologie constitue un facteur significatif de la qualité viticole, 
 
 ### Annexe : 
 
-Maxime Le Gal : j'ai fais les visualisations pour les questions 9, 11 et 12 du readme. J'ai effectué les modifications nécessaires pour la bonne exécution du rapport ainsi que le bon affichage de ce dernier. J'ai également été chargé de réaliser les visualisations sur Le logiciel Tableau afin de le comparer à R.
+Tout au long du semestre, nous nous sommes répartis les tâches assez équitablement.
+
+Lors de la construction de la proposition, Xianqian et Hortense se sont chargées de rédiger l’introduction ; pendant qu’Enoa et Maxime se sont occupés de réfléchir aux questions et de rédiger le plan d’analyse. Puis, nous nous sommes réparti les 12 questions pour compléter ce à quoi on s’attendait, les graphiques envisagés, ainsi que les datasets et features requises pour la réalisation. 
+
+Pour la rédaction du livrable 1, nous avons chacun sélectionné une question à traiter. Hortense s’est occupée de la question 4, Enoa de la 7, Maxime de la 9, et Xianqian de la 3.
+
+Dans le cadre du rapport, nous avons repris les questions que nous avions traité respectivement en prenant en compte les commentaires de l’évaluation par les pairs, et avons sélectionné chacun deux autres questions à traiter. 
+Hortense, en plus de la question 4, s’est chargée des questions 1 et 2. C’est également elle qui s’est occupée de la construction du shinydashboard. Elle a intégré prettydoc et a réordonné les questions par thématiques.
+Maxime, en plus de la question 9, s’est occupé des questions 11 et 12. Il a effectué les modifications nécessaires pour la bonne exécution du rapport ainsi que le bon affichage de ce dernier. Il a également été chargé de réaliser les visualisations sur le logiciel Tableau, et de les comparer à celles sur R.
+Xianqian, en plus de la question 3, a pris en charge les questions 5 et 6. Elle s’est également occupée, avec Enoa, de préparer le support de soutenance.
+Enoa, en plus de la question 7, a réalisé les questions 8 et 10. Comme énoncé précédemment, elle a participé en collaboration avec Xianqian a la construction du support de soutenance. 
+Les dernières modifications de mise en forme, ont été réalisées par tous les membres du groupe.
+
