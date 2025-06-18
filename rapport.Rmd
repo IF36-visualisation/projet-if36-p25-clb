@@ -503,7 +503,7 @@ ggplot(wines_top_pays, aes(x = Year, y = Rating, color = Country)) +
   scale_fill_manual(values = rainbow(10)) 
 ```
 
-On constate donc une baisse de la note des vins en général, particulièrement frappant pour le cas de l'Italie et de l'Australie, mais cette visualisation ne permet pas d'être précise car elle ne trace les lignes de tendance que de 3 pays. De plus, il faudrait croiser cette analyse avec une visualition de l'impact du changement climatique sur les différentes régions/ pays. 
+ L’objectif était de vérifier si le réchauffement climatique a un impact visible sur la qualité perçue des vins, à travers les notes qui leur sont attribuées. On observe qu’il n’y a pas de baisse claire ou généralisée des notes dans ces pays. Au contraire, certaines régions affichent même une légère hausse ou une certaine stabilité. Mais les pays les plus impactés par le réchauffement climatique semblent tout de même être ceux les plus impactés également dans leurs notations. Il convient tout de même de se rappeler que ces notations sont issues d'individus qui sont soumis à des biais cognitifs et culturels, par exemple l'appelation Bordeaux Saint Emilion peut être mieux notée pour une même qualité simplement par le fait de son appelation
 
 
 
