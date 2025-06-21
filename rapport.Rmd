@@ -341,7 +341,7 @@ On peut imaginer que les régions disposant des mêmes conditions météorologiq
 **Traitement des données**
 Afin d’étudier si différents types de vin présentent une qualité similaire dans des conditions météorologiques comparables, j’ai choisi de réaliser l’analyse au sein d’une même région et d’une même année. Cela permet de garantir au maximum l’homogénéité des conditions climatiques. J’ai identifié les dix régions les plus représentées dans la base de données, puis basé mon analyse sur ces régions. Le choix de régions avec un volume de données important permet d’améliorer la significativité statistique des résultats obtenus.
 
-```{r question5a, echo= FALSE, results='hide'}
+```{r question5a, echo= FALSE, message=FALSE, warning=FALSE, results='hide',include=FALSE}
 library(dplyr)
 library(readr)
 library(ggplot2)
@@ -1210,6 +1210,8 @@ Enfin, il a été difficile d’évaluer précisément l’influence des biais c
 **Enoa :** Pour conclure je dirais que j'ai retenu de ce projet l'importance de connaître son jeu de données, et des biais qu'il comporte si on ne l'analyse pas assez. D'un point de vue personnel, je trouve qu'il aurait vraiment été intéressant d'apprendre les techniques qui permettent de produire des prédictions les plus fiables possible.
 
 **Hortense :** Au cours de ce projet, j’ai découvert l’étendue des possibilités offertes par R : on peut quasiment tout réaliser avec. Dès qu’une idée d’ajout ou de modification sur un graphique nous vient, il y a de fortes chances que ce soit réalisable, ce qui offre une grande liberté dans la création graphique. Selon moi, il aurait été intéressant d’approfondir davantage Tableau, qui est un type de technologie massivement utilisé en entreprise, et qui nous aurait permis d’améliorer notre maîtrise de l’outil.
+
+**Xiaoqian :** Ce projet m’a permis de découvrir la diversité des outils que l’on peut mobiliser en data science : avec R, Shiny et Tableau, on peut non seulement explorer, transformer et visualiser des données, mais aussi construire des analyses interactives et accessibles. Travailler sur le choix du dataset et sur les angles d’analyse m’a fait prendre conscience de l’importance des décisions méthodologiques dans l’interprétation des résultats.Cette expérience m’a donné envie d’approfondir mes compétences en visualisation de données, un domaine que je trouve à la fois créatif et essentiel.
 
 ---
 
