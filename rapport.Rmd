@@ -1213,6 +1213,8 @@ Enfin, il a été difficile d’évaluer précisément l’influence des biais c
 
 **Xiaoqian :** Ce projet m’a permis de découvrir la diversité des outils que l’on peut mobiliser en data science : avec R, Shiny et Tableau, on peut non seulement explorer, transformer et visualiser des données, mais aussi construire des analyses interactives et accessibles. Travailler sur le choix du dataset et sur les angles d’analyse m’a fait prendre conscience de l’importance des décisions méthodologiques dans l’interprétation des résultats.Cette expérience m’a donné envie d’approfondir mes compétences en visualisation de données, un domaine que je trouve à la fois créatif et essentiel.
 
+**Maxime :** Durant ce projet j'ai ou compléter mon pole de compétence orienté data. L'utilisation de R m'apporte un atout avec la possibilité de visualiser les données sur lequelles je travaille. Je peux ainsi proposer des analyses plus complètes tout en amélioration mes présenations et rapports avec des visualisations sur mesure. Une utilisation plus importante de Tableau aurait pu completer cette UE afin de maîtriser un autre outuil de dataviz largement utilisé en entreprise.
+
 ---
 
 ### Annexe : 
