@@ -150,26 +150,30 @@ scatter_data <- wines_fusionne %>%
                values_to = "Temperature")
 
 # Scatterplot avec couleurs personnalisées
-ggplot(scatter_data, aes(x = Temperature, y = Rating, color = Type)) +
-  geom_point(alpha = 0.4, size = 1) +
-  geom_smooth(method = "lm", se = FALSE, linewidth = 2) +
-  facet_wrap(~Month, scales = "free_x") +
-  scale_color_manual(
-    values = c(
-      "Red" = "red",
-      "White" = "gold",
-      "Rosé" = "pink",
-      "Sparkling" = "skyblue"
-    )
-  ) +
-  labs(
-    title = "Note du vin vs Température moyenne (mois clés) par type de vin",
-    x = "Température moyenne (°C)",
-    y = "Note"
-  ) +
-  theme_minimal()
-
+#ggplot(scatter_data, aes(x = Temperature, y = Rating, color = Type)) +
+#  geom_point(alpha = 0.4, size = 1) +
+#  geom_smooth(method = "lm", se = FALSE, linewidth = 2) +
+#  facet_wrap(~Month, scales = "free_x") +
+#  scale_color_manual(
+#    values = c(
+#      "Red" = "red",
+#      "White" = "gold",
+#      "Rosé" = "pink",
+#      "Sparkling" = "skyblue"
+#    )
+#  ) +
+#  labs(
+#    title = "Note du vin vs Température moyenne (mois clés) par type de vin",
+#    x = "Température moyenne (°C)",
+#    y = "Note"
+#  ) +
+#  theme_minimal()
+  
 ```
+
+![](shiny/shiny_quI1.png)
+
+*Ce graphique est un screenshot du Shinydashboard, vous pouvez le retrouver dans shiny/app.R .*
 
 On observe que les vins rouges présentent une grande stabilité dans leur note, quelle que soit la température. Cela confirme leur résistance face aux variations climatiques, même lorsque les températures deviennent élevées. Les vins blancs suivent une tendance similaire, bien que légèrement plus sensible, notamment en avril.
 
@@ -491,17 +495,20 @@ wines_top_pays <- wines_fusionne %>%
   filter(Country %in% top_pays)
 
 # Graphique : évolution des ratings
-ggplot(wines_top_pays, aes(x = Year, y = Rating, color = Country)) +
-  geom_point(alpha = 0.6) +
-  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
-  labs(
-    title = "Évolution des notes des vins dans les pays les plus impactés",
-    x     = "Année",
-    y     = "Note du Vin"
-  ) +
-  theme_minimal()+
-  scale_fill_manual(values = rainbow(10)) 
+#ggplot(wines_top_pays, aes(x = Year, y = Rating, color = Country)) +
+#  geom_point(alpha = 0.6) +
+#  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
+#  labs(
+#    title = "Évolution des notes des vins dans les pays les plus impactés",
+#    x     = "Année",
+#    y     = "Note du Vin"
+#  ) +
+#  theme_minimal()+
+#  scale_fill_manual(values = rainbow(10)) 
 ```
+![](shiny/shiny_quII2.png)
+
+*Ce graphique est un screenshot du Shinydashboard, vous pouvez le retrouver dans shiny/app.R .*
 
  L’objectif était de vérifier si le réchauffement climatique a un impact visible sur la qualité perçue des vins, à travers les notes qui leur sont attribuées. On observe qu’il n’y a pas de baisse claire ou généralisée des notes dans ces pays. Au contraire, certaines régions affichent même une légère hausse ou une certaine stabilité. Mais les pays les plus impactés par le réchauffement climatique semblent tout de même être ceux les plus impactés également dans leurs notations. Il convient tout de même de se rappeler que ces notations sont issues d'individus qui sont soumis à des biais cognitifs et culturels, par exemple l'appelation Bordeaux Saint Emilion peut être mieux notée pour une même qualité simplement par le fait de son appelation
 
@@ -989,8 +996,12 @@ Ce graphique juxtapose, pour chaque année entre 2004 et 2018, la note moyenne d
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Graphiques complémentaires
-print(p2)
+#print(p2)
 ```
+
+![](shiny/shiny_quIV1b.png)
+
+*Ce graphique est un screenshot du Shinydashboard, vous pouvez le retrouver dans shiny/app.R .*
 
 On observe une tendance claire : plus l’indice climatique optimal est élevé, plus la note moyenne des vins augmente (pente positive, r = 0,342). Toutefois, cette relation reste loin d’être parfaite, car des millésimes ayant un indice identique peuvent afficher des notes très disparates, ce qui traduit une dispersion marquée. Cela s’explique par la présence de nombreux facteurs complémentaires (terroir, cépage, pratiques viticoles, etc.) qui contribuent significativement à la qualité finale et limitent la force de la seule corrélation météorologique. Par ailleurs, on note une évolution temporelle intéressante : les années 2004–2007 (en bleu) se situent le plus souvent dans la zone « fort indice → bonne note », alors que les millésimes plus récents (en rouge) se concentrent autour d’un indice moyen (55–65 %) et présentent des notes légèrement inférieures. Au final, ce graphique confirme que la météo exerce un impact réel mais **modéré et pas complètement prédictif** : un bon millésime climatique augmente les chances d’obtenir une note élevée, sans pour autant garantir à lui seul le succès du vin.
 
