@@ -1,17 +1,22 @@
 ---
-title: "Rapport - Analyse de la qualité de différents vins et des conditions météorologiques
-  des régions de production"
+title: "Rapport - Analyse de la qualité de différents vins et des conditions météorologiques des régions de production"
 output:
   prettydoc::html_pretty:
     theme: hpstr
-date: "2024-05-05"
+date: "21/06/2025"
 knitr:
   opts_chunk:
     echo: false
-    warning: false,
-    message: false,
+    warning: false
+    message: false
     results: hide
 ---
+
+```{css, echo=FALSE}
+body, .container {
+  text-align: justify;
+}
+```
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
