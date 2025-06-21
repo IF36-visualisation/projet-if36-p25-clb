@@ -801,74 +801,51 @@ library(dplyr)
 
 # 1. CHARGEMENT ET PRÉPARATION DES DONNÉES
 
-# Fonction pour charger et nettoyer les données météo par type de vin
 load_wine_data <- function(file_path, wine_type) {
   data <- read.csv(file_path)
   data$Type <- wine_type
   return(data)
 }
 
-# Chargement des 4 datasets météo
 red_data <- load_wine_data("Red_Weather.csv", "Rouge")
 rose_data <- load_wine_data("Rose_Weather.csv", "Rosé")
 sparkling_data <- load_wine_data("Sparkling_Weather.csv", "Pétillant")
 white_data <- load_wine_data("White_Weather.csv", "Blanc")
 
-# Combinaison de tous les datasets
 all_wines <- bind_rows(red_data, rose_data, sparkling_data, white_data)
 
 # 2. CALCUL DE L'INDICE CLIMATIQUE OPTIMAL
 
-# Fonction pour calculer l'indice climatique optimal par année
 calculate_climate_index <- function(data) {
-  # Agrégation des données météo par année et type de vin
   yearly_data <- data %>%
     group_by(Year, Type) %>%
     summarise(
-      # Températures moyennes (idéal : ni trop chaud, ni trop froid)
       temp_moy = mean(c(Jan_tavg, Feb_tavg, Mar_tavg, Apr_tavg, May_tavg, Jun_tavg,
                         Jul_tavg, Aug_tavg, Sep_tavg, Oct_tavg, Nov_tavg, Dec_tavg), na.rm = TRUE),
-      
-      # Précipitations critiques (faibles pendant floraison mai-juin et récolte sep-oct)
       prcp_critique = mean(c(May_prcp, Jun_prcp, Sep_prcp, Oct_prcp), na.rm = TRUE),
-      
-      # Ensoleillement pendant la maturation (jul-sept)
       ensol_maturation = mean(c(Jul_tsun, Aug_tsun, Sep_tsun), na.rm = TRUE),
-      
       note_moyenne = mean(Rating, na.rm = TRUE),
-      
-      # Nombre d'observations
       n_vins = n(),
       .groups = 'drop'
     ) %>%
-    filter(!is.na(note_moyenne) & n_vins >= 5) # Filtrer les années avec peu de données
+    filter(!is.na(note_moyenne) & n_vins >= 5)
   
-  # Normalisation des variables météo (0-1, où 1 = optimal)
   yearly_data <- yearly_data %>%
     mutate(
-      # Température optimale : proche de 15°C (normalisation inversée pour l'écart)
       temp_norm = 1 - abs(temp_moy - 15) / max(abs(temp_moy - 15), na.rm = TRUE),
-      
-      # Précipitations faibles = mieux (normalisation inversée)
       prcp_norm = 1 - (prcp_critique - min(prcp_critique, na.rm = TRUE)) / 
         (max(prcp_critique, na.rm = TRUE) - min(prcp_critique, na.rm = TRUE)),
-      
-      # Ensoleillement élevé = mieux
       ensol_norm = (ensol_maturation - min(ensol_maturation, na.rm = TRUE)) / 
-        (max(ensol_maturation, na.rm = TRUE) - min(ensol_maturation, na.rm = TRUE))
-    ) %>%
-    # Calcul de l'indice climatique optimal (moyenne pondérée)
-    mutate(
+        (max(ensol_maturation, na.rm = TRUE) - min(ensol_maturation, na.rm = TRUE)),
       indice_climatique = (temp_norm * 0.4 + prcp_norm * 0.35 + ensol_norm * 0.25) * 100
     )
   
   return(yearly_data)
 }
 
-# Calcul des indices climatiques
 climate_data <- calculate_climate_index(all_wines)
 
-# 3. AGRÉGATION GLOBALE PAR ANNÉE (tous types confondus)
+# 3. AGRÉGATION GLOBALE PAR ANNÉE
 
 global_yearly <- climate_data %>%
   group_by(Year) %>%
@@ -878,53 +855,41 @@ global_yearly <- climate_data %>%
     nb_vins_total = sum(n_vins, na.rm = TRUE),
     .groups = 'drop'
   ) %>%
-  filter(nb_vins_total >= 20) # Années avec suffisamment de données
+  filter(nb_vins_total >= 20)
 
-# 4. CRÉATION DES VISUALISATIONS
+# 4. VISUALISATION PRINCIPALE (SANS AXE SECONDAIRE)
 
-# Graphique principal : Notes vs Indice climatique par année
-p1 <- ggplot(global_yearly, aes(x = Year)) +
-  # Aire de l'indice climatique en arrière-plan
-  geom_area(aes(y = indice_climatique_global/25), 
-            fill = "lightblue", alpha = 0.3) +
-  
-  # Courbe des notes moyennes
-  geom_line(aes(y = note_globale), 
-            color = "#8B0000", size = 1.2) +
-  geom_point(aes(y = note_globale, size = nb_vins_total), 
-             color = "#8B0000", alpha = 0.7) +
-  
-  # Courbe de l'indice climatique (échelle secondaire)
-  geom_line(aes(y = indice_climatique_global/25), 
-            color = "#1E90FF", size = 1, linetype = "dashed") +
-  
-  # Axes secondaires
-  scale_y_continuous(
-    name = "Note moyenne des vins",
-    limits = c(3.2, 4.2),
-    sec.axis = sec_axis(~ . * 25, name = "Indice climatique optimal (%)")
-  ) +
-  
+# Normalisation pour afficher sur une échelle commune
+global_yearly_plot <- global_yearly %>%
+  mutate(
+    note_norm   = (note_globale - min(note_globale)) / (max(note_globale) - min(note_globale)),
+    indice_norm = (indice_climatique_global - min(indice_climatique_global)) /
+                  (max(indice_climatique_global) - min(indice_climatique_global))
+  )
+
+p1 <- ggplot(global_yearly_plot, aes(x = Year)) +
+  geom_area(aes(y = indice_norm), fill = "lightblue", alpha = 0.3) +
+  geom_line(aes(y = note_norm), color = "#8B0000", size = 1.2) +
+  geom_point(aes(y = note_norm, size = nb_vins_total), color = "#8B0000", alpha = 0.7) +
+  geom_line(aes(y = indice_norm), color = "#1E90FF", size = 1, linetype = "dashed") +
+  scale_y_continuous(name = "Valeurs normalisées [0–1]") +
   scale_size_continuous(name = "Nombre de vins", range = c(2, 6)) +
-  
   labs(
     title = "Les \"Bonnes Années\" Viticoles : Météo Idéale vs Qualité des Vins",
-    subtitle = "Relation entre conditions climatiques optimales et notes moyennes par millésime",
+    subtitle = "Courbes normalisées : Note moyenne vs Indice climatique",
     x = "Année",
-    caption = "Sources : Données météorologiques et notations vins | Indice climatique basé sur température, précipitations et ensoleillement"
+    caption = "Sources : Données météo et notations vins"
   ) +
-  
   theme_minimal() +
   theme(
     plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
     plot.subtitle = element_text(size = 11, hjust = 0.5),
-    axis.title.y.left = element_text(color = "#8B0000"),
-    axis.title.y.right = element_text(color = "#1E90FF"),
     legend.position = "bottom",
     panel.grid.minor = element_blank()
   )
 
-# Graphique de corrélation
+# 5. CORRÉLATION GLOBALE
+
 correlation_coef <- cor(global_yearly$note_globale, 
                         global_yearly$indice_climatique_global, 
                         use = "complete.obs")
@@ -932,52 +897,45 @@ correlation_coef <- cor(global_yearly$note_globale,
 p2 <- ggplot(global_yearly, aes(x = indice_climatique_global, y = note_globale)) +
   geom_point(aes(size = nb_vins_total, color = Year), alpha = 0.7) +
   geom_smooth(method = "lm", se = TRUE, color = "red", linetype = "dashed") +
-  
   scale_color_gradient(low = "blue", high = "red", name = "Année") +
   scale_size_continuous(name = "Nb vins", range = c(3, 8)) +
-  
   labs(
     title = sprintf("Corrélation Météo-Qualité (r = %.3f)", correlation_coef),
     x = "Indice Climatique Optimal (%)",
     y = "Note Moyenne des Vins",
     subtitle = "Chaque point représente une année"
   ) +
-  
   theme_minimal() +
   theme(
     plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
     legend.position = "right"
   )
 
-# Analyse par type de vin
+# 6. PAR TYPE DE VIN
+
 p3 <- ggplot(climate_data, aes(x = Year, y = note_moyenne, color = Type)) +
   geom_line(size = 1) +
   geom_point(aes(size = n_vins), alpha = 0.6) +
-  
   scale_color_manual(values = c("Rouge" = "red", "Blanc" = "gold", 
                                 "Rosé" = "pink", "Pétillant" = "skyblue")) +
   scale_size_continuous(name = "Nb vins", range = c(1, 4)) +
-  
   labs(
     title = "Évolution des Notes par Type de Vin",
     x = "Année",
     y = "Note Moyenne",
     color = "Type de Vin"
   ) +
-  
   theme_minimal() +
   theme(legend.position = "bottom")
 
-# 5. IDENTIFICATION DES MEILLEURES ANNÉES
+# 7. IDENTIFICATION DES MEILLEURES ANNÉES
 
-# Top 5 des meilleures années (indice climatique)
 top_climate_years <- global_yearly %>%
   arrange(desc(indice_climatique_global)) %>%
   head(5) %>%
   select(Year, indice_climatique_global, note_globale) %>%
   mutate(rang_climat = row_number())
 
-# Top 5 des meilleures années (notes)
 top_rating_years <- global_yearly %>%
   arrange(desc(note_globale)) %>%
   head(5) %>%
@@ -992,9 +950,8 @@ print(top_rating_years)
 
 print(sprintf("=== CORRÉLATION GLOBALE : r = %.3f ===", correlation_coef))
 
-# 6. AFFICHAGE DES GRAPHIQUES
+# 8. AFFICHAGE DES GRAPHIQUES
 
-# Graphique principal
 print(p1)
 ```
 
