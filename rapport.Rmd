@@ -82,6 +82,7 @@ Chacun des datasets contiennent les mêmes champs, à l'exception de 'Red_Weathe
 
 Les features "Jan_tavg", "Jan_tmin", "Jan_tmax", "Jan_prcp" et "Jan_tsun" sont celles qui correspondent au mois de janvier. Il existe les mêmes features pour chacuns des mois de l'année, qui sont nommées avec la structure : [3 premières lettres du mois]_[nom de la donnée météorologique].
 
+---
 
 # Plan d’Analyse
 
@@ -1239,6 +1240,8 @@ Effets différentiels : L'impact des mêmes conditions varie selon la saison
 
 Si la météorologie constitue un facteur significatif de la qualité viticole, elle ne représente qu'une composante d'un système complexe. L'excellence du vin résulte de l'interaction harmonieuse entre conditions climatiques favorables et savoir-faire humain, rappelant que derrière chaque grand millésime se cachent autant l'art du vigneron que les caprices de la nature.
 
+---
+
 ### Conclusion : 
 
 Au cours de cette étude, nous avons pu explorer en profondeur les caractéristiques des vins rouges, blancs, rosés et pétillants, ainsi que l’influence que les conditions climatiques exercent sur leur qualité perçue. L’analyse croisée des données œnologiques et météorologiques a mis en évidence un impact réel du climat sur les notes attribuées aux vins, bien que cet effet varie selon les types de vin et les régions. Les vins rouges, notamment, semblent montrer une meilleure résilience face aux variations climatiques.
@@ -1250,6 +1253,7 @@ Enfin, il a été difficile d’évaluer précisément l’influence des biais c
 
 **Hortense :** Au cours de ce projet, j’ai découvert l’étendue des possibilités offertes par R : on peut quasiment tout réaliser avec. Dès qu’une idée d’ajout ou de modification sur un graphique nous vient, il y a de fortes chances que ce soit réalisable, ce qui offre une grande liberté dans la création graphique. Selon moi, il aurait été intéressant d’approfondir davantage Tableau, qui est un type de technologie massivement utilisé en entreprise, et qui nous aurait permis d’améliorer notre maîtrise de l’outil.
 
+---
 
 ### Annexe : 
 
@@ -1263,6 +1267,6 @@ Dans le cadre du rapport, nous avons repris les questions que nous avions trait�
 Hortense, en plus de la question 4, s’est chargée des questions 1 et 2. C’est également elle qui s’est occupée de la construction du shinydashboard. Elle a intégré prettydoc et a réordonné les questions par thématiques.
 Maxime, en plus de la question 9, s’est occupé des questions 11 et 12. Il a effectué les modifications nécessaires pour la bonne exécution du rapport ainsi que le bon affichage de ce dernier. Il a également été chargé de réaliser les visualisations sur le logiciel Tableau, et de les comparer à celles sur R.
 Xianqian, en plus de la question 3, a pris en charge les questions 5 et 6. Elle s’est également occupée, avec Enoa, de préparer le support de soutenance.
-Enoa, en plus de la question 7, a réalisé les questions 8 et 10. Comme énoncé précédemment, elle a participé en collaboration avec Xianqian a la construction du support de soutenance. 
+Enoa, en plus de la question 7, a réalisé les questions 8 et 10. Comme énoncé précédemment, elle a participé en collaboration avec Xianqian a la construction du support de soutenance. ELle s'est également chargée de rédiger la conclusion du rapport.
 Les dernières modifications de mise en forme, ont été réalisées par tous les membres du groupe.
 
