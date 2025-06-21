@@ -1230,7 +1230,9 @@ Nous avons observé que, dans des contextes climatiques similaires, les vins obt
 Un autre manque important concerne l'absence de données sur les pratiques viticoles locales. Des informations sur l’adaptabilité des producteurs face aux aléas climatiques nous auraient permis de mieux comprendre les dynamiques de qualité à venir, et d’envisager des prédictions plus robustes. Ainsi, cette piste pourrait constituer un axe d'approfondissement de notre étude
 Enfin, il a été difficile d’évaluer précisément l’influence des biais cognitifs ou culturels sur les notations des consommateurs. Par exemple, la popularité de certains pays viticoles pourrait tenir davantage à leur image ou à leurs appellations qu’à la qualité intrinsèque des vins. De même, l’effet du prix sur la perception reste un facteur connu, mais difficile à quantifier avec précision à partir des seules données disponibles.
 
-Enoa : Pour conclure je dirais que j'ai retenu de ce projet l'importance de connaître son jeu de données, et des biais qu'il comporte si on ne l'analyse pas assez. D'un point de vue personnel, je trouve qu'il aurait vraiment été intéressant d'apprendre les techniques qui permettent de produire des prédictions les plus fiables possible.
+**Enoa :** Pour conclure je dirais que j'ai retenu de ce projet l'importance de connaître son jeu de données, et des biais qu'il comporte si on ne l'analyse pas assez. D'un point de vue personnel, je trouve qu'il aurait vraiment été intéressant d'apprendre les techniques qui permettent de produire des prédictions les plus fiables possible.
+
+**Hortense :** Au cours de ce projet, j’ai découvert l’étendue des possibilités offertes par R : on peut quasiment tout réaliser avec. Dès qu’une idée d’ajout ou de modification sur un graphique nous vient, il y a de fortes chances que ce soit réalisable, ce qui offre une grande liberté dans la création graphique. Selon moi, il aurait été intéressant d’approfondir davantage Tableau, qui est un type de technologie massivement utilisé en entreprise, et qui nous aurait permis d’améliorer notre maîtrise de l’outil.
 
 
 ### Annexe : 
