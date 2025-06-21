@@ -1223,6 +1223,16 @@ Effets différentiels : L'impact des mêmes conditions varie selon la saison
 
 Si la météorologie constitue un facteur significatif de la qualité viticole, elle ne représente qu'une composante d'un système complexe. L'excellence du vin résulte de l'interaction harmonieuse entre conditions climatiques favorables et savoir-faire humain, rappelant que derrière chaque grand millésime se cachent autant l'art du vigneron que les caprices de la nature.
 
+### Conclusion : 
+
+Au cours de cette étude, nous avons pu explorer en profondeur les caractéristiques des vins rouges, blancs, rosés et pétillants, ainsi que l’influence que les conditions climatiques exercent sur leur qualité perçue. L’analyse croisée des données œnologiques et météorologiques a mis en évidence un impact réel du climat sur les notes attribuées aux vins, bien que cet effet varie selon les types de vin et les régions. Les vins rouges, notamment, semblent montrer une meilleure résilience face aux variations climatiques.
+Nous avons observé que, dans des contextes climatiques similaires, les vins obtiennent souvent des notes proches, suggérant une certaine cohérence régionale. Cependant, l’interprétation des résultats a parfois été limitée par les déséquilibres du jeu de données : certains pays étaient massivement surreprésentés (comme l’Italie par rapport à la Moldavie), ce qui nous a poussés à adapter nos analyses pour éviter des biais liés au jeu de données.
+Un autre manque important concerne l'absence de données sur les pratiques viticoles locales. Des informations sur l’adaptabilité des producteurs face aux aléas climatiques nous auraient permis de mieux comprendre les dynamiques de qualité à venir, et d’envisager des prédictions plus robustes. Ainsi, cette piste pourrait constituer un axe d'approfondissement de notre étude
+Enfin, il a été difficile d’évaluer précisément l’influence des biais cognitifs ou culturels sur les notations des consommateurs. Par exemple, la popularité de certains pays viticoles pourrait tenir davantage à leur image ou à leurs appellations qu’à la qualité intrinsèque des vins. De même, l’effet du prix sur la perception reste un facteur connu, mais difficile à quantifier avec précision à partir des seules données disponibles.
+
+Enoa : Pour conclure je dirais que j'ai retenu de ce projet l'importance de connaître son jeu de données, et des biais qu'il comporte si on ne l'analyse pas assez. D'un point de vue personnel, je trouve qu'il aurait vraiment été intéressant d'apprendre les techniques qui permettent de produire des prédictions les plus fiables possible.
+
+
 ### Annexe : 
 
 Tout au long du semestre, nous nous sommes répartis les tâches assez équitablement.
