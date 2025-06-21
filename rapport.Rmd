@@ -647,7 +647,7 @@ custom_colors <- c(
   "Red" = "red",
   "White" = "gold",
   "Rose" = "pink",
-  "Sparkling" = "skyblue"
+  "Sparkling" = "skyblue")
 
 # Créer les scatter plots
 p1 <- ggplot(wines_summary, aes(x = Avg_Temp, y = Avg_Rating, color = Type)) +
