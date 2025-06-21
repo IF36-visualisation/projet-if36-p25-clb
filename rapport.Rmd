@@ -1,3 +1,4 @@
+
 ---
 title: "Rapport - Analyse de la qualité de différents vins et des conditions météorologiques des régions de production"
 output:
@@ -89,7 +90,7 @@ Les features "Jan_tavg", "Jan_tmin", "Jan_tmax", "Jan_prcp" et "Jan_tsun" sont c
 L'analyse des types de données et de leur description nous a amené à nous poser diverses questions, que nous détaillons ci-après. Pour certaines question, il pourra être pertinent de rassembler toutes les données dans une seule et même table.
 
 ## Analyse Exploratoire
-```{r librairies, echo= FALSE, message=FALSE, warning=FALSE}
+```{r librairies, echo= FALSE, message=FALSE, warning=FALSE, results='hide'}
 # Import des librairies
 library(ggplot2)
 library(dplyr)
@@ -340,7 +341,7 @@ On peut imaginer que les régions disposant des mêmes conditions météorologiq
 **Traitement des données**
 Afin d’étudier si différents types de vin présentent une qualité similaire dans des conditions météorologiques comparables, j’ai choisi de réaliser l’analyse au sein d’une même région et d’une même année. Cela permet de garantir au maximum l’homogénéité des conditions climatiques. J’ai identifié les dix régions les plus représentées dans la base de données, puis basé mon analyse sur ces régions. Le choix de régions avec un volume de données important permet d’améliorer la significativité statistique des résultats obtenus.
 
-```{r question5a, echo= FALSE}
+```{r question5a, echo= FALSE, results='hide'}
 library(dplyr)
 library(readr)
 library(ggplot2)
@@ -390,7 +391,7 @@ data_selected %>%
 
 **Graphique 1 : Box diagram - notes de vin par région et année **
 
-```{r question5b, echo= FALSE}
+```{r question5b, echo= FALSE, results='hide'}
 
 data_selected <- data_selected %>%
   mutate(Région_Année = paste(Region, Year, sep = " - "))
@@ -419,7 +420,7 @@ Cela signifie que l’écart de notes entre la majorité des vins dans une même
 
 **Graphique 2 : Histogramme - l’écart-type des notes par région et année**
 
-```{r question5c, echo= FALSE}
+```{r question5c, echo= FALSE, results='hide'}
 data_selected <- data_selected %>%
   mutate(Région_Année = paste(Region, Year, sep = " - "))
 
@@ -526,7 +527,7 @@ wines_top_pays <- wines_fusionne %>%
 
 Nous nous attendons à ce que l'Italie soit le pays producteur dont les vins sont les plus appréciés, car c'est le plus gros producteur du monde, mais aussi celui qui subit le moins de conditions météorologiques défavorables. Pour vérifier cela, nous allons calculer la note moyenne attribuée aux vins provenant d'un même pays, afin de comparer les notes moyennes de chacuns des pays. Grâce à cela, nous pourrons obtenir le classement des pays selon les notes que leurs vins ont obtenus, et ainsi en déduire quel est ou quels sont les pays préférés à l'échelle mondiale.
 
-```{r question4a, echo= FALSE}
+```{r question4a, echo= FALSE, results='hide'}
 # Garder uniquement les colonnes utiles
 red_qu4 <- red %>% select(Country, Rating)
 rose_qu4 <- rose %>% select(Country, Rating)
@@ -554,7 +555,7 @@ country_ratings <- wine_data %>%
   arrange(desc(mean_rating))
 ```
 
-```{r, echo= FALSE}
+```{r, echo= FALSE, results='hide'}
 # Top 10 des pays (triés par note moyenne)
 top_countries <- country_ratings %>%
   top_n(10, mean_rating) %>%
@@ -589,7 +590,7 @@ count_Moldova <- wine_data %>%
 
 Si l'on se base simplement sur les résultats que nous apportent les données, on pourrait en conclure que la Moldavie est le pays producteur de vin préféré à l'échelle mondiale. Cependant, il y a une limite à cette représentation, et qui est le nombre d'occurence de chacun des pays. Par exemple, nous avons 13 vins moldaves analysés, face à 3636 italiens. L'ordre de grandeur n'étant pas le même, la comparaison est moins pertinente.
 
-```{r question4b, echo=FALSE}
+```{r question4b, echo=FALSE, results='hide'}
 # --- Graphique 2 : Top 10 des plus grands producteurs ---
 top_producing_countries <- country_ratings %>%
   arrange(desc(count)) %>%
@@ -630,7 +631,7 @@ On peut imaginer que les raisins des vins préférés par les consommateurs ont 
 Pour répondre à cette question, nous allons analyser les corrélations entre les conditions météorologiques et les notes attribuées aux différents types de vin. Nous allons étudier les corrélations par rapport aux températures moyennes, aux précipitations et à l'ensoleillement.
 
 
-```{r question 8b, echo=FALSE, warning=FALSE, message=FALSE}
+```{r question 8b, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
 
 library(ggplot2)
 library(dplyr)
@@ -787,7 +788,7 @@ Ainsi, pour résumer nous pourrions dire que en effet la variabilité climatique
 
 On s’attend à ce que certaines années se démarquent avec des conditions climatiques idéales (températures moyennes modérées, peu de précipitations pendant la floraison et la récolte, bon ensoleillement), et qu’elles soient associées à des notes plus élevées. On pourrait observer un pic global de notes dans ces “bonnes années”. Il faudra agréger les données météo sur l’année, les normaliser, puis les relier aux moyennes de notes par millésime.
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
 
 # Analyse des "bonnes années" viticoles : Conditions météorologiques vs Notes des vins
 
@@ -957,7 +958,7 @@ print(p1)
 
 Ce graphique juxtapose, pour chaque année entre 2004 et 2018, la note moyenne des vins (axe de gauche, en rouge foncé) et l’indice climatique « idéal » (axe de droite, en bleu) en fonction du temps. On observe que, sur cette période, l’indice climatique optimal progresse globalement vers le bas : après un pic de 105 % autour de 2006, il se situe plutôt près de 95 % à partir de 2015, signe d’années légèrement moins « parfaites » du point de vue météo. En parallèle, la note moyenne des vins suit une tendance similaire : elle descend d’un peu plus de 4,10 en 2006 à environ 3,72 en 2017, avant de se redresser légèrement en 2018. La taille croissante des cercles illustre le nombre de vins notés, ce qui montre que les millésimes les plus récents ont aussi vu un volume d’évaluations plus conséquent. Au final, cette double courbe suggère que lorsque les conditions climatiques s’éloignent de l’optimum (baisse de l’indice), la qualité moyenne mesurée des vins décline sensiblement, confirmant qu’un « bon millésime » au niveau météo tend à générer des notes supérieures.
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
 # Graphiques complémentaires
 #print(p2)
 ```
@@ -968,7 +969,7 @@ Ce graphique juxtapose, pour chaque année entre 2004 et 2018, la note moyenne d
 
 On observe une tendance claire : plus l’indice climatique optimal est élevé, plus la note moyenne des vins augmente (pente positive, r = 0,342). Toutefois, cette relation reste loin d’être parfaite, car des millésimes ayant un indice identique peuvent afficher des notes très disparates, ce qui traduit une dispersion marquée. Cela s’explique par la présence de nombreux facteurs complémentaires (terroir, cépage, pratiques viticoles, etc.) qui contribuent significativement à la qualité finale et limitent la force de la seule corrélation météorologique. Par ailleurs, on note une évolution temporelle intéressante : les années 2004–2007 (en bleu) se situent le plus souvent dans la zone « fort indice → bonne note », alors que les millésimes plus récents (en rouge) se concentrent autour d’un indice moyen (55–65 %) et présentent des notes légèrement inférieures. Au final, ce graphique confirme que la météo exerce un impact réel mais **modéré et pas complètement prédictif** : un bon millésime climatique augmente les chances d’obtenir une note élevée, sans pour autant garantir à lui seul le succès du vin.
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
 print(p3)
 ```
 
@@ -983,7 +984,7 @@ Hypothèse hydrique : Un équilibre des précipitations (ni trop sec, ni trop hu
 Hypothèse solaire : Un ensoleillement suffisant est nécessaire pour la photosynthèse et la concentration des sucres
 Hypothèse saisonnière : L'impact des conditions météo varie selon les périodes clés du cycle viticole
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
 # Analyse Simple : Impact des Conditions Météorologiques sur les Notes des Vins
 # =============================================================================
 
@@ -1105,7 +1106,7 @@ corrplot(correlations, method = "color", type = "upper",
 
 Cette matrice de corrélation met en lumière l’intensité des corrélations entre toutes les variables météorologiques et les notes de qualité : les couleurs chaudes (rouge/orange) indiquent des liens positifs forts, les nuances froides (bleu) signalent des corrélations négatives. Cette représentation permet d’identifier rapidement les variables météo les plus influentes, de repérer les redondances – par exemple l’intercorrélation fréquente des températures saisonnières.
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
 
 # 6. ANALYSE PAR SAISONS
 # ======================
@@ -1161,7 +1162,7 @@ On oberve ici une corrélation positive donc un apport hydrique suffisant favori
 Nous pouvons voir une corrélation positive : plus d'ensoleillement favorise la photosynthèse et la concentration des sucres. Mais aussi une effet de seuil : un minimum d'heures de soleil est nécessaire pour une qualité optimale L'ensoleillement peut aussi interagir avec la température (années chaudes et ensoleillées). 
 
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
 print(p6)
 ```
 
@@ -1226,4 +1227,3 @@ Maxime, en plus de la question 9, s’est occupé des questions 11 et 12. Il a e
 Xianqian, en plus de la question 3, a pris en charge les questions 5 et 6. Elle s’est également occupée, avec Enoa, de préparer le support de soutenance.
 Enoa, en plus de la question 7, a réalisé les questions 8 et 10. Comme énoncé précédemment, elle a participé en collaboration avec Xianqian a la construction du support de soutenance. ELle s'est également chargée de rédiger la conclusion du rapport.
 Les dernières modifications de mise en forme, ont été réalisées par tous les membres du groupe.
-
